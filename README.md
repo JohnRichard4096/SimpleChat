@@ -1,7 +1,7 @@
 # SimpleChat
 
 为了防止玩家间的不友好聊天，这个插件诞生了。目前仅支持新的bukkit api，这意味着它最低支持到1.14.x
-目前插件正在开发中，将在不就后上线
+目前插件正在开发中，将在不久后上线
 
 
 # 指令帮助:
@@ -42,4 +42,10 @@
 1.config.yml
 
 
-2.badworda.yml
+2.badwords.yml
+
+如你所见，它的格式是这样的，yml列表的形式，如果你觉得麻烦，完全可以使用指令来添加。
+
+ForbiddenWords:
+ - Example
+ - Example
