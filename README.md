@@ -68,5 +68,7 @@ banConfiguration:
 如你所见，它的格式是这样的，yml列表的形式，如果你觉得麻烦，完全可以使用指令来添加。
 
 ForbiddenWords:
+ 
  —— Example
+
  —— Example
