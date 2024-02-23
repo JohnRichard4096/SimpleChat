@@ -1,0 +1,5 @@
+banConfiguration:
+  violationThreshold: 5
+  banDuration: 6000
+  enableDefaultBadWords: false
+  importDefaultBadWords: false
