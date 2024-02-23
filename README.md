@@ -1,3 +1,4 @@
+![1708678347009](https://github.com/JohnRichard4096/SimpleChat/assets/67693593/62581726-c4e0-4333-bc06-b599645d2562)
 # SimpleChat
 
 为了防止玩家间的不友好聊天，这个插件诞生了。目前仅支持新的bukkit api，使用java17编译，这意味着它最低支持到1.17
