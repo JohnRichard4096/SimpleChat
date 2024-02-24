@@ -1,0 +1,52 @@
+name: SimpleChat
+version: '1.01-SNAPSHOT'
+main: com.simplechat.SimpleChat
+api-version: '1.20'
+author: JohnRichard
+
+commands:
+  schat-reload:
+    description: Reload the plugin configuration
+    usage: /schat reload
+    permission: schat.reload
+
+  schat-addbadword:
+    description: Add a word to the list of forbidden words
+    usage: /schat addbadword <word>
+    permission: schat.addbadword
+    default: op
+
+  schat-delbadword:
+    description: Remove a word from the list of forbidden words
+    usage: /schat delbadword <word>
+    permission: schat.delbadword
+    default: op
+
+
+  schat-mute:
+    description: mute player
+    permission: schat.mute
+    usage: /schat mute <playerName> [reason] [duration] 时间可以为1m 1d之类的
+    default: op
+
+  schat-unmute:
+    description: unmute player
+    usage: /schat unmute <player>
+    default: op
+    permission: schat.unmute
+
+  schat:
+    description: info
+    default: player
+
+  schat-list:
+    description: List bad words
+    default: op
+
+  schat-undo:
+    description: Undo action
+    usage: /schat-undo <action> <player>
+    default: op
+
+  reload:
+  reload confirm:
