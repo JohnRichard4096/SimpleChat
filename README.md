@@ -67,6 +67,12 @@ banConfiguration:
   #禁言时间（tick）
 
 
+  enableDefaultBadWords: false
+
+  
+  importDefaultBadWords: false
+
+
 2.badwords.yml
 
 如你所见，它的格式是这样的，yml列表的形式，如果你觉得麻烦，完全可以使用指令来添加。
