@@ -1,6 +1,0 @@
-#yml的格式采用列表
-#比如，您想要去添加违禁词
-#请在forbiddenWords:下方添加
-#- <违禁词> 所有符号为半角
-forbiddenWords:
-  - word1-example
