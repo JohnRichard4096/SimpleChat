@@ -51,18 +51,22 @@
   &quot;associatedIndex&quot;: 2
 }</component>
   <component name="ProjectId" id="2cirrlAXoSN7ghK1k2DFsj48TQV" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
     "Maven.SimpleChat package.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "<未知>",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/acer/Documents/GitHub/SimpleChat",
+    "last_opened_file_path": "C:/Users/acer/IdeaProjects/SimpleChat",
     "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
   }
 }]]></component>
@@ -179,6 +183,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Code" />
     <option name="LAST_COMMIT_MESSAGE" value="Code" />
   </component>
