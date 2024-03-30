@@ -401,7 +401,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
 
         if (label.equalsIgnoreCase("schat")) {
-            sender.sendMessage("Schat V1.11");
+            sender.sendMessage("Schat V1.12");
             sender.sendMessage("By JohnRicahrd");
             sender.sendMessage("帮助：/schat 调出本界面");
             sender.sendMessage("/schat-addbadword 添加违禁词");
