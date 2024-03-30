@@ -47,11 +47,11 @@
         <filtering>true</filtering>
           <includes>
               <include>**/*.txt</include> <!-- 包含所有txt文件 -->
+              <include>**/*.yml</include> <!-- 包含所有yaml文件 -->
           </includes>
       </resource>
     </resources>
   </build>
-
   <repositories>
       <repository>
           <id>papermc-repo</id>

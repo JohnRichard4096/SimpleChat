@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
@@ -160,10 +161,15 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         String message = event.getMessage();
         String playerName = event.getPlayer().getName();
+
+        // 检查玩家是否为 OP
+        if (event.getPlayer().isOp()) {
+            return; // 对于 OP 玩家不执行任何操作
+        }
 
         for (String word : forbiddenWords) {
             if (message.toLowerCase().contains(word.toLowerCase())) {
@@ -171,21 +177,21 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 violations++;
                 playerViolationCount.put(playerName, violations);
 
-                // Log the violation with timestamp
+                // 记录违规行为及时间戳
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String timestamp = sdf.format(new Date());
-                logger.info(playerName + " violated chat rules by using the word: " + word + " at " + timestamp);
+                logger.info(playerName + " 违反聊天规则，使用了违规词语: " + word + "，时间：" + timestamp);
                 event.getPlayer().sendMessage("你的消息违规了，已被撤回");
 
                 if (violations >= violationThreshold) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage("你被禁言了.");
-                    getServer().getScheduler().runTaskLater(this, () -> {
-                        playerViolationCount.put(playerName, 0);
-                        event.getPlayer().sendMessage("你已经被解除禁言了.");
-                    }, banDuration);
 
-                    // Revoke forbidden message
+                    // 同步处理撤回和禁言操作
+                    playerViolationCount.put(playerName, 0);
+                    event.getPlayer().sendMessage("你已经被解除禁言了.");
+
+                    // 撤回违规消息
                     String censoredMessage = message.replaceAll("(?i)" + word, "*censored*");
                     event.setMessage(censoredMessage);
                 }
@@ -370,6 +376,9 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
                 saveResource("systembadword.txt", false);
                 logger.info("Created systembadword.txt");
+                if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
+                    importDefaultBadWords();
+                }
             } else {
                 sender.sendMessage("你没有权限执行命令 (schat.reload).");
             }
