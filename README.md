@@ -10,5 +10,7 @@
 目前插件依然在维护开发，我们没有跑路，我们不保证插件百分百不会出现任何bug，也不保证用户体验。
 
 
+## paperMC https://hangar.papermc.io/johnrichard4096/SimpleChat
+
 # 嘿！你为什么不去看看wiki呢？
 # 什么？还有WIKI？快带我去！https://github.com/JohnRichard4096/SimpleChat/wiki
