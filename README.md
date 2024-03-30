@@ -2,3 +2,4 @@
 # SimpleChat-Velocity端
 
 一个适合服务器群组，简单易用聊天违禁词检测插件！安装到Velocity端即可使用。
+## 为什么你不去看看wiki呢？
