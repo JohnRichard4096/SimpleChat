@@ -31,11 +31,14 @@ import java.text.SimpleDateFormat;
 
 public class SimpleChat extends JavaPlugin implements Listener {
     private File banWordsFile;
+    private Map<String, Boolean> playerMutedStatus = new HashMap<>();
+
     private FileConfiguration banWordsConfig;
     private List<String> forbiddenWords;
     private Map<String, Integer> playerViolationCount = new HashMap<>();
     private int violationThreshold;
     private int banDuration;
+
 
     private int Version = 13;
     private static final Logger logger = Logger.getLogger("SimpleChat");
@@ -206,6 +209,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
+
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         String message = event.getMessage();
         String playerName = event.getPlayer().getName();
@@ -230,18 +234,29 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 if (violations >= violationThreshold) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage("你被禁言了.");
+                    playerMutedStatus.put(playerName, true);
                     getServer().getScheduler().runTaskLater(this, () -> {
                         playerViolationCount.put(playerName, 0);
                         event.getPlayer().sendMessage("你已经被解除禁言了.");
+                        playerMutedStatus.put(playerName, false);
+                        event.setCancelled(false);
                     }, banDuration);
 
                     // Revoke forbidden message
                     String censoredMessage = message.replaceAll("(?i)" + word, "*censored*");
                     event.setMessage(censoredMessage);
+
+                    // 检查玩家是否处于禁言状态，如果是，则禁止发送任何消息
+                    if (playerMutedStatus.getOrDefault(playerName, false)) {
+                        event.setCancelled(true);
+                        event.getPlayer().sendMessage("你已被禁言，无法发送消息.");
+                    }
+
                 }
                 return;
             }
         }
+
     }
 
     @Override
