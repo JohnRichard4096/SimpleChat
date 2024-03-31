@@ -55,9 +55,9 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     String versionStr = reader.readLine();
                     if (versionStr != null) {
                         int version = Integer.parseInt(versionStr);
-                        if (version < Version) {
-                            getLogger().warning("你已经落后" + (Version - version) + "个开发版本了！");
-                        } else if (version > Version) {
+                        if (version > Version) {
+                            getLogger().warning("你已经落后" + (version - Version) + "个开发版本了！");
+                        } else if (version < Version) {
                             getLogger().warning("这是哪个版本？自己构建的？");
                         } else if (version == Version){
                             getLogger().info("您正在运行最新版本");
