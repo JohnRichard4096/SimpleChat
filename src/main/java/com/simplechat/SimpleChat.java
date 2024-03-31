@@ -109,7 +109,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         // 在创建badwords.yml文件时检查是否导入内置违禁词列表
         try {
             if (banWordsFile.createNewFile()) {
-                if (getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
+                if (getConfig().getBoolean("banConfiguration.importDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.enableDefaultBadWords",true)) {
                     // 导入内置违禁词列表
                     List<String> defaultBadWords = Arrays.asList("badword1", "badword2", "badword3");
                     banWordsConfig.set("forbiddenWords", defaultBadWords);
