@@ -1,5 +1,4 @@
 package com.simplechat;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -10,13 +9,22 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.FileHandler;
 import java.util.*;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.text.SimpleDateFormat;
 
@@ -28,12 +36,45 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private Map<String, Integer> playerViolationCount = new HashMap<>();
     private int violationThreshold;
     private int banDuration;
+
+    private int Version = 13;
     private static final Logger logger = Logger.getLogger("SimpleChat");
+
+
     @Override
     public void onEnable() {
 
         loadConfig();
         loadBanWords();
+        String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            try {
+                URL url = new URL(versionUrl);
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    String versionStr = reader.readLine();
+                    if (versionStr != null) {
+                        int version = Integer.parseInt(versionStr);
+                        if (version < Version) {
+                            getLogger().warning("你已经落后" + (Version - version) + "个开发版本了！");
+                        } else if (version > Version) {
+                            getLogger().warning("这是哪个版本？自己构建的？");
+                        } else if (version == Version){
+                            getLogger().info("您正在运行最新版本");
+                        }
+                    } else {
+                        getLogger().warning("无法从版本号文件中读取版本号");
+                    }
+                } catch (IOException | NumberFormatException e) {
+                    getLogger().warning("无法读取或解析版本号");
+                }
+            } catch (MalformedURLException e) {
+                getLogger().warning("无法获取版本！");
+            }
+        });
+        executor.shutdown();
+
+
         InputStream inputStream = getClass().getResourceAsStream("/badwords.yml");
         File badWordFile = new File(getDataFolder(), "systembadword.txt");
         if (badWordFile.exists()) {
@@ -53,7 +94,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             getLogger().warning("内置资源不存在！");
         }
         banWordsFile = new File(getDataFolder(), "badwords.yml");
-        getLogger().info("正式版本！请查看github.com/JohnRichard4096/SimpleChat/re 以获取最新版本。");
+        getLogger().info("正式版本！请查看github.com/JohnRichard4096/SimpleChat/release 以获取最新版本。");
         getServer().getPluginManager().registerEvents(this, this);
         try {
             File logsFolder = new File(getDataFolder(), "logs");
@@ -90,6 +131,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     @Override
     public void  onDisable(){
         getLogger().info("SimpleChat插件已卸载！");
+        logger.info("插件已启用");
         File txtFile = new File(getDataFolder(), "systembadwords.txt");
         if (txtFile.exists()) {
             if (txtFile.delete()) {
@@ -141,9 +183,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     banWordsConfig.save(banWordsFile);
                 } catch (IOException e) {
                     getLogger().warning("无法读取系统默认敏感词文件.");
+                    logger.warning("无法读取系统默认敏感词文件！");
                 }
             } else {
                 getLogger().warning("无法加载系统默认敏感词文件 'systembadword.txt'");
+                logger.warning("无法加载默认敏感词文件！");
             }
         }
     }
@@ -186,12 +230,12 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 if (violations >= violationThreshold) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage("你被禁言了.");
+                    getServer().getScheduler().runTaskLater(this, () -> {
+                        playerViolationCount.put(playerName, 0);
+                        event.getPlayer().sendMessage("你已经被解除禁言了.");
+                    }, banDuration);
 
-                    // 同步处理撤回和禁言操作
-                    playerViolationCount.put(playerName, 0);
-                    event.getPlayer().sendMessage("你已经被解除禁言了.");
-
-                    // 撤回违规消息
+                    // Revoke forbidden message
                     String censoredMessage = message.replaceAll("(?i)" + word, "*censored*");
                     event.setMessage(censoredMessage);
                 }
@@ -199,7 +243,6 @@ public class SimpleChat extends JavaPlugin implements Listener {
             }
         }
     }
-
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -213,8 +256,6 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         String reason = args.length >= 2 ? args[1] : "无";
                         int duration = args.length >= 3 ? Integer.parseInt(args[2]) : -1; // 默认为永久禁言
 
-                        // 执行禁言逻辑
-                        // 例如：schatMutePlayer(target, reason, duration);
 
                         sender.sendMessage("已禁言玩家 " + target.getName() + "，原因: " + reason + "，时长: " + (duration == -1 ? "永久" : duration + "分钟"));
                     } else {
@@ -297,16 +338,16 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
 
 
-        if (label.equalsIgnoreCase("schat-list")) {
+        if (label.equalsIgnoreCase("schat-list")) { //列出违禁词，读取指令
             if (sender.isOp()) {
                 if (args.length == 0) {
                     if (banWordsFile.exists()) {
                         YamlConfiguration banWordsConfig = YamlConfiguration.loadConfiguration(banWordsFile);
                         List<String> forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
-
-                        int pageSize = 20;
+                        //从yaml中读取
+                        int pageSize = 20;//一页的显示数量
                         int totalPages = (int) Math.ceil((double) forbiddenWords.size() / pageSize);
-
+                        //起始页
                         int startIndex = 0;
                         int endIndex = Math.min(startIndex + pageSize, forbiddenWords.size());
 
@@ -364,7 +405,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
 
-        if (label.equalsIgnoreCase("schat-reload")) {
+        if (label.equalsIgnoreCase("schat-reload")) { //显而易见，重载
             if (sender.hasPermission("schat.reload")) {
                 loadConfig();
                 loadBanWords();
@@ -379,6 +420,34 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
                     importDefaultBadWords();
                 }
+                String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
+                ExecutorService executor = Executors.newSingleThreadExecutor();
+                executor.submit(() -> {
+                    try {
+                        URL url = new URL(versionUrl);
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                            String versionStr = reader.readLine();
+                            if (versionStr != null) {
+                                int version = Integer.parseInt(versionStr);
+                                if (version < Version) {
+                                    getLogger().warning("你已经落后" + (Version - version) + "个开发版本了！");
+                                } else if (version > Version) {
+                                    getLogger().warning("这是哪个版本？自己构建的？");
+                                } else if (version == Version){
+                                    getLogger().info("您正在运行最新版本");
+                                }
+                            } else {
+                                getLogger().warning("无法从版本号文件中读取版本号");
+                            }
+                        } catch (IOException | NumberFormatException e) {
+                            getLogger().warning("无法读取或解析版本号");
+                        }
+                    } catch (MalformedURLException e) {
+                        getLogger().warning("无法获取版本！");
+                    }
+                });
+                executor.shutdown();
+
             } else {
                 sender.sendMessage("你没有权限执行命令 (schat.reload).");
             }
@@ -388,7 +457,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
             if (sender.hasPermission("schat.addbadword")) {
                 if (args.length == 1) {
                     String newWord = args[0].toLowerCase();
-                    if (!forbiddenWords.contains(newWord)) {
+                    if (newWord == "*")
+                    {
+                        sender.sendMessage("你不能添加'*'!");
+                    }
+                    else if (!forbiddenWords.contains(newWord)) {
                         forbiddenWords.add(newWord);
                         banWordsConfig.set("forbiddenWords", forbiddenWords);
                         try {
@@ -410,7 +483,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
 
         if (label.equalsIgnoreCase("schat")) {
-            sender.sendMessage("Schat V1.13");
+            sender.sendMessage("Schat V1.13.1");
             sender.sendMessage("By JohnRicahrd");
             sender.sendMessage("帮助：/schat 调出本界面");
             sender.sendMessage("/schat-addbadword 添加违禁词");
@@ -434,18 +507,31 @@ public class SimpleChat extends JavaPlugin implements Listener {
             if (sender.hasPermission("schat.delbadword")) {
                 if (args.length == 1) {
                     String wordToRemove = args[0].toLowerCase();
-                    if (forbiddenWords.contains(wordToRemove)) {
-                        forbiddenWords.remove(wordToRemove);
+                    if (wordToRemove.equals("*")) {
+                        // 移除所有违禁词
+                        forbiddenWords.clear();
                         banWordsConfig.set("forbiddenWords", forbiddenWords);
                         try {
                             banWordsConfig.save(banWordsFile);
-                            sender.sendMessage("成功从违禁词列表中移除 '" + wordToRemove + "'.");
+                            sender.sendMessage("成功移除所有违禁词.");
                         } catch (IOException e) {
                             e.printStackTrace();
                             sender.sendMessage("保存 badwords.yml 文件时发生错误.");
                         }
                     } else {
-                        sender.sendMessage("单词 '" + wordToRemove + "' 不在违禁词列表中.");
+                        if (forbiddenWords.contains(wordToRemove)) {
+                            forbiddenWords.remove(wordToRemove);
+                            banWordsConfig.set("forbiddenWords", forbiddenWords);
+                            try {
+                                banWordsConfig.save(banWordsFile);
+                                sender.sendMessage("成功从违禁词列表中移除 '" + wordToRemove + "'.");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                sender.sendMessage("保存 badwords.yml 文件时发生错误.");
+                            }
+                        } else {
+                            sender.sendMessage("单词 '" + wordToRemove + "' 不在违禁词列表中.");
+                        }
                     }
                 } else {
                     sender.sendMessage("用法: /schat-delbadword <word>");
