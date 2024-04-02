@@ -45,7 +45,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        Updater Updater = new Updater();	//实例化 Son 类
+        //Updater Updater = new Updater();	//实例化 类
 
         loadConfig();
         loadBanWords();
@@ -129,7 +129,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Updater.UseUpdater();
+        //Updater.UseUpdater();
     }
     @Override
     public void  onDisable(){
