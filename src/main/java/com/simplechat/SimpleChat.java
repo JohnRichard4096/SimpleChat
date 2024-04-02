@@ -39,7 +39,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private int banDuration;
 
 
-    private int Version = 13;
+    private int Version = 14;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
