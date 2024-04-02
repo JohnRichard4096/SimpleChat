@@ -11,18 +11,22 @@ import static org.bukkit.Bukkit.getLogger;
 public class Updater {
     int Version = 13;
 
-    public void main(String[] args) {
+
+
+
+    public void UseUpdater() {
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
         try {
+            Thread.sleep(10 * 60 * 1000); // 10分钟的毫秒数
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        while (true) {
             try {
                 Thread.sleep(10 * 60 * 1000); // 10分钟的毫秒数
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        } finally {
-
-        }
-        while (true) {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(() -> {
                 try {
@@ -51,6 +55,7 @@ public class Updater {
             executor.shutdown();
 
         }
+
     }
 }
 

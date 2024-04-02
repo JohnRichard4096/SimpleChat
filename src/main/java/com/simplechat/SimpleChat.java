@@ -24,7 +24,6 @@ import java.util.logging.FileHandler;
 import java.util.*;
 
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.logging.Logger;
 import java.text.SimpleDateFormat;
 
@@ -46,6 +45,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        Updater Updater = new Updater();	//实例化 Son 类
 
         loadConfig();
         loadBanWords();
@@ -129,7 +129,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        Updater.UseUpdater();
     }
     @Override
     public void  onDisable(){
@@ -208,7 +208,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST) //事件处理，最高优先级。
 
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         String message = event.getMessage();
@@ -234,6 +234,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 if (violations >= violationThreshold) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage("你被禁言了.");
+
                     playerMutedStatus.put(playerName, true);
                     getServer().getScheduler().runTaskLater(this, () -> {
                         playerViolationCount.put(playerName, 0);
@@ -243,15 +244,16 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     }, banDuration);
 
                     // Revoke forbidden message
-                    String censoredMessage = message.replaceAll("(?i)" + word, "*censored*");
-                    event.setMessage(censoredMessage);
+
 
                     // 检查玩家是否处于禁言状态，如果是，则禁止发送任何消息
                     if (playerMutedStatus.getOrDefault(playerName, false)) {
                         event.setCancelled(true);
                         event.getPlayer().sendMessage("你已被禁言，无法发送消息.");
                     }
-
+                    else{
+                        return;
+                    }
                 }
                 return;
             }
@@ -266,13 +268,16 @@ public class SimpleChat extends JavaPlugin implements Listener {
             if (sender.hasPermission("schat.mute")) {
                 if (args.length >= 1) {
                     Player target = Bukkit.getPlayer(args[0]);
-                    if (target != null) {
+                    if (target != null ) {
                         // 获取禁言原因和时长
-                        String reason = args.length >= 2 ? args[1] : "无";
-                        int duration = args.length >= 3 ? Integer.parseInt(args[2]) : -1; // 默认为永久禁言
+                        if(playerMutedStatus.get(target.getName() == null && playerMutedStatus.getOrDefault(target.getName() ,true))){
+                            String reason = args.length >= 2 ? args[1] : "无";
+                            int duration = args.length >= 3 ? Integer.parseInt(args[2]) : -1; // 默认为永久禁言
+                            playerMutedStatus.put(target.getName(),true);
 
+                            sender.sendMessage("已禁言玩家 " + target.getName() + "，原因: " + reason + "，时长: " + (duration == -1 ? "永久" : duration + "分钟"));
+                        }
 
-                        sender.sendMessage("已禁言玩家 " + target.getName() + "，原因: " + reason + "，时长: " + (duration == -1 ? "永久" : duration + "分钟"));
                     } else {
                         sender.sendMessage("玩家 " + args[0] + " 不在线或不存在.");
                     }
@@ -294,8 +299,9 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
                     if (action.equalsIgnoreCase("mute")) {
                         // 撤销禁言逻辑
-                        if (playerViolationCount.containsKey(targetPlayer)) {
+                        if (playerViolationCount.containsKey(targetPlayer) && playerMutedStatus.getOrDefault(targetPlayer ,false)) {
                             playerViolationCount.remove(targetPlayer);
+                            playerMutedStatus.put(targetPlayer,true);
                             sender.sendMessage("成功撤销玩家 " + targetPlayer + " 的禁言.");
                         } else {
                             sender.sendMessage("玩家 " + targetPlayer + " 没有被禁言.");
@@ -304,8 +310,9 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         // 解禁逻辑
                         // 实现解禁逻辑，例如移除玩家的禁言状态
                         // 在这里重新实现禁言逻辑，保留原来的禁言时间
-                        if (playerViolationCount.containsKey(targetPlayer)) {
+                        if (playerViolationCount.containsKey(targetPlayer) && playerMutedStatus.getOrDefault(targetPlayer,true)) {
                             int duration = playerViolationCount.get(targetPlayer);
+                            playerMutedStatus.put(targetPlayer,false);
                             // 实现重新禁言逻辑，保留原来的禁言时间
                             // 例如：schatMutePlayer(targetPlayer, "重新禁言", duration);
                             sender.sendMessage("成功重新禁言玩家 " + targetPlayer + "，时长: " + (duration == -1 ? "永久" : duration + "分钟"));
@@ -337,7 +344,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     if (target != null) {
                         // 执行解除禁言逻辑
                         playerViolationCount.put(target.getName(), 0); // 将该玩家的违规次数设为0，解除禁言
-
+                        playerMutedStatus.put(target.getName(),true);
                         sender.sendMessage("已解除玩家 " + target.getName() + " 的禁言.");
                     } else {
                         sender.sendMessage("玩家 " + args[0] + " 不在线或不存在.");
