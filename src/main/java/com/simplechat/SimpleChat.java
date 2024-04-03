@@ -447,7 +447,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
 
-        if (label.equalsIgnoreCase("schat-reload") || sender.isOp()) { //显而易见，重载
+        if (label.equalsIgnoreCase("schat-reload") ) { //显而易见，重载
             if (sender.hasPermission("schat.reload") || sender.isOp()) {
                 loadConfig();
                 loadBanWords();
