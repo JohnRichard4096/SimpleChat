@@ -24,22 +24,25 @@ import java.util.logging.FileHandler;
 import java.util.*;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.logging.Logger;
 import java.text.SimpleDateFormat;
 
 
+@SuppressWarnings("deprecation")
 public class SimpleChat extends JavaPlugin implements Listener {
     private File banWordsFile;
-    private Map<String, Boolean> playerMutedStatus = new HashMap<>();
+    private final Map<String, Boolean> playerMutedStatus = new HashMap<>();
 
     private FileConfiguration banWordsConfig;
     private List<String> forbiddenWords;
-    private Map<String, Integer> playerViolationCount = new HashMap<>();
+    private final Map<String, Integer> playerViolationCount = new HashMap<>();
     private int violationThreshold;
     private int banDuration;
 
 
-    private int Version = 15;
+    private final int Version = 15;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -155,13 +158,12 @@ public class SimpleChat extends JavaPlugin implements Listener {
         banWordsFile = new File(getDataFolder(), "badwords.yml");
         if (banWordsFile.exists()) {
             banWordsConfig = YamlConfiguration.loadConfiguration(banWordsFile);
-            forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
         } else {
             getLogger().warning("未找到 'badwords.yml' 文件，将创建新的文件.");
             banWordsConfig = new YamlConfiguration();
             saveResource("badwords.yml", false);
-            forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
         }
+        forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
 
         // 根据配置决定是否加载默认敏感词
         if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
@@ -282,7 +284,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String label, String[] args) {
 
         if (label.equalsIgnoreCase("schat-mute") ) {
             if (sender.hasPermission("schat.mute") || sender.isOp()) {
@@ -304,11 +306,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 } else {
                     sender.sendMessage("Usage: /schat-mute <playerName> [reason] [duration]");
                 }
-                return true;
             } else {
                 sender.sendMessage("你没有执行的权限 (schat.mute).");
-                return true;
             }
+            return true;
         }
 
         if (label.equalsIgnoreCase("schat-undo")) {
@@ -349,11 +350,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 } else {
                     sender.sendMessage("用法: /schat-undo <action> <player>");
                 }
-                return true;
             } else {
                 sender.sendMessage("只有OP才能执行该命令.");
-                return true;
             }
+            return true;
         }
 
 
@@ -372,11 +372,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 } else {
                     sender.sendMessage("Usage: /schat-unmute <playerName>");
                 }
-                return true;
             } else {
                 sender.sendMessage("你没有执行的权限 (schat.unmute).");
-                return true;
             }
+            return true;
         }
 
 
@@ -435,11 +434,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 } else {
                     sender.sendMessage("Usage: /schat-list page <页数>");
                 }
-                return true;
             } else {
                 sender.sendMessage("您需要op权限.");
-                return true;
             }
+            return true;
         }
 
 
@@ -499,7 +497,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             if (sender.hasPermission("schat.addbadword") || sender.isOp()) {
                 if (args.length == 1) {
                     String newWord = args[0].toLowerCase();
-                    if (newWord == "*")
+                    if (newWord.equals("*"))
                     {
                         sender.sendMessage("你不能添加'*'!");
                     }
@@ -517,11 +515,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 } else {
                     sender.sendMessage("用法: /schat-addbadword <word>");
                 }
-                return true;
             } else {
                 sender.sendMessage("你没有权限 (schat.addbadword).");
-                return true;
             }
+            return true;
         }
 
         if (label.equalsIgnoreCase("schat")) {
@@ -573,11 +570,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 } else {
                     sender.sendMessage("用法: /schat-delbadword <word>");
                 }
-                return true;
             } else {
                 sender.sendMessage("你没有权限 (schat.delbadword).");
-                return true;
             }
+            return true;
         }
 
 
