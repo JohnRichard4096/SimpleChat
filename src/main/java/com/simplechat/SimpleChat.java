@@ -495,7 +495,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             }
             return true;
         }
-        if (label.equalsIgnoreCase("schat-addbadword") || sender.isOp()) {
+        if (label.equalsIgnoreCase("schat-addbadword")) {
             if (sender.hasPermission("schat.addbadword") || sender.isOp()) {
                 if (args.length == 1) {
                     String newWord = args[0].toLowerCase();
@@ -540,7 +540,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
 
 
-        if (label.equalsIgnoreCase("schat-delbadword") || sender.isOp()) {
+        if (label.equalsIgnoreCase("schat-delbadword") ) {
             if (sender.hasPermission("schat.delbadword") || sender.isOp()) {
                 if (args.length == 1) {
                     String wordToRemove = args[0].toLowerCase();
