@@ -1,5 +1,9 @@
 package com.simplechat;
+
+import com.google.common.util.concurrent.ForwardingExecutorService;
+import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
+import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.Provider;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -44,13 +49,14 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     private final int Version = 15;
     private static final Logger logger = Logger.getLogger("SimpleChat");
-
+    private ForwardingExecutorService executor;
+    private Provider boards;
 
 
     @Override
     public void onEnable() {
-        Updater Updater = new Updater();	//实例化 类
-
+        Updater Updater = new Updater();
+        getServer().getPluginManager().registerEvents(this, this);
         loadConfig();
         loadBanWords();
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
@@ -83,7 +89,6 @@ public class SimpleChat extends JavaPlugin implements Listener {
         });
         executor.shutdown();
 
-
         InputStream inputStream = getClass().getResourceAsStream("/badwords.yml");
         File badWordFile = new File(getDataFolder(), "systembadword.txt");
         if (badWordFile.exists()) {
@@ -104,7 +109,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
         banWordsFile = new File(getDataFolder(), "badwords.yml");
         getLogger().info("正式版本！请查看github.com/JohnRichard4096/SimpleChat/release 以获取最新版本。");
-        getServer().getPluginManager().registerEvents(this, this);
+
         try {
             File logsFolder = new File(getDataFolder(), "logs");
             if (!logsFolder.exists()) {
@@ -215,7 +220,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(AsyncPlayerChatEvent event,FastBoard board) {
         String message = event.getMessage();
         String playerName = event.getPlayer().getName();
 
