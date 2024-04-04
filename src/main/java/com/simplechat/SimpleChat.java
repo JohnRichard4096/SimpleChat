@@ -223,7 +223,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChat(AsyncPlayerChatEvent event,FastBoard board) {
-        board.updateTitle(ChatColor.GOLD + "国粹记录榜");
+        //board.updateTitle(ChatColor.GOLD + "国粹记录榜");
         String message = event.getMessage();
         String playerName = event.getPlayer().getName();
 
@@ -251,10 +251,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 String timestamp = sdf.format(new Date());
                 logger.info(playerName + " 违反聊天规则，使用了违规词语: " + word + "，时间：" + timestamp);
                 event.getPlayer().sendMessage("你的消息违规了，已被撤回");
-                board.updateLines(
+                /*board.updateLines(
                         "",
                         "玩家" + event.getPlayer() + "使用国粹次数：" + playerViolationCount
-                );
+                );*/
                 String[] words = message.split(" "); // 将消息分割成单词
                 StringBuilder markedMessage = new StringBuilder();
                 for (String w : words) {
