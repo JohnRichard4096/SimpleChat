@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 import static org.bukkit.Bukkit.getLogger;
 
 public class Updater {
-    int Version = 114514;
+    int Version = 16;
 
 
 
