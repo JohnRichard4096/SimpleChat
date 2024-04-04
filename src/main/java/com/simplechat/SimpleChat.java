@@ -291,11 +291,12 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 if (args.length >= 1) {
                     Player target = Bukkit.getPlayer(args[0]);
                     if (target != null ) {
+                        String name = target.getName();
                         // 获取禁言原因和时长
                         if(!playerMutedStatus.getOrDefault(target.getName(),false)){
                             String reason = args.length >= 2 ? args[1] : "无";
                             int duration = args.length >= 3 ? Integer.parseInt(args[2]) : -1; // 默认为永久禁言
-                            playerMutedStatus.put(target.getName(),false);
+                            playerMutedStatus.put(name,false);
 
                             sender.sendMessage("已禁言玩家 " + target.getName() + "，原因: " + reason + "，时长: " + (duration == -1 ? "永久" : duration + "分钟"));
                         }
