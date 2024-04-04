@@ -6,7 +6,7 @@
 
   <groupId>com.simplechat</groupId>
   <artifactId>SimpleChat</artifactId>
-  <version>1.13.3</version>
+  <version>1.14-ALPHA</version>
   <packaging>jar</packaging>
 
   <name>SimpleChat</name>

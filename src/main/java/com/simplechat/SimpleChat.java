@@ -3,11 +3,13 @@ package com.simplechat;
 import com.google.common.util.concurrent.ForwardingExecutorService;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -47,7 +49,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private int banDuration;
 
 
-    private final int Version = 15;
+    private final int Version = 114514;
     private static final Logger logger = Logger.getLogger("SimpleChat");
     private ForwardingExecutorService executor;
     private Provider boards;
@@ -221,6 +223,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChat(AsyncPlayerChatEvent event,FastBoard board) {
+        board.updateTitle(ChatColor.GOLD + "国粹记录榜");
         String message = event.getMessage();
         String playerName = event.getPlayer().getName();
 
@@ -248,6 +251,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 String timestamp = sdf.format(new Date());
                 logger.info(playerName + " 违反聊天规则，使用了违规词语: " + word + "，时间：" + timestamp);
                 event.getPlayer().sendMessage("你的消息违规了，已被撤回");
+                board.updateLines(
+                        "",
+                        "玩家" + event.getPlayer() + "使用国粹次数：" + playerViolationCount
+                );
                 String[] words = message.split(" "); // 将消息分割成单词
                 StringBuilder markedMessage = new StringBuilder();
                 for (String w : words) {
@@ -266,10 +273,17 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 event.getPlayer().sendMessage(markedMessage.toString());
 
 
+
+
+
                 if (violations >= violationThreshold || playerMutedStatus.getOrDefault(playerName,false)) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage("你被禁言了.");
                     playerMutedStatus.put(playerName, true);
+                    board.updateLines(
+                            "",
+                            "玩家" + event.getPlayer() + "被禁言力"
+                    );
 
                     // 记录违规消息
 
@@ -528,7 +542,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
 
         if (label.equalsIgnoreCase("schat")) {
-            sender.sendMessage("Schat V1.13.3");
+            sender.sendMessage("Schat V1.14-Alpha");
             sender.sendMessage("By JohnRicahrd");
             sender.sendMessage("帮助：/schat 调出本界面");
             sender.sendMessage("/schat-addbadword 添加违禁词");
