@@ -39,7 +39,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private int banDuration;
 
 
-    private int Version = 16;
+    private int Version = 15;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -262,14 +262,14 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 if (violations >= violationThreshold || playerMutedStatus.getOrDefault(playerName,false)) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage("你被禁言了.");
-                    playerMutedStatus.put(playerName, false);
+                    playerMutedStatus.put(playerName, true);
 
                     // 记录违规消息
 
                     getServer().getScheduler().runTaskLater(this, () -> {
                         playerViolationCount.put(playerName, 0);
                         event.getPlayer().sendMessage("你已经被解除禁言了.");
-                        playerMutedStatus.put(playerName, true);
+                        playerMutedStatus.put(playerName, false);
                     }, banDuration);
                     return;
                 }
