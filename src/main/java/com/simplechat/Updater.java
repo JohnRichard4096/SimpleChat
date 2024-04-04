@@ -38,7 +38,7 @@ public class Updater {
                             if (version < Version) {
                                 getLogger().warning("你已经落后" + (Version - version) + "个开发版本了！");
                             } else if (version > Version) {
-                                getLogger().warning("这是哪个版本？自己构建的？");
+                                getLogger().warning("这是哪个版本？自己构建的？！");
                             } else if (version == Version) {
                                 getLogger().info("您正在运行最新版本");
                             }
