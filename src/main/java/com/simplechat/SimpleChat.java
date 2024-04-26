@@ -90,15 +90,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         saveResource("systembadword.txt", false);
         logger.info("Created systembadword.txt");
         File txtFile = new File(getDataFolder(), "systembadwords.txt");
-        if (txtFile.exists()) {
-            if (txtFile.setReadOnly()) {
-                getLogger().info("启用资源保护");
-            } else {
-                getLogger().warning("资源保护进程失效");
-            }
-        } else {
-            getLogger().warning("内置资源不存在！");
-        }
+
         banWordsFile = new File(getDataFolder(), "badwords.yml");
         getLogger().info("正式版本！请查看github.com/JohnRichard4096/SimpleChat/release 以获取最新版本。");
         getServer().getPluginManager().registerEvents(this, this);
