@@ -88,7 +88,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
 
         saveResource("systembadword.txt", false);
-        logger.info("Created systembadword.txt");
+        logger.info("创建系统资源！");
         File txtFile = new File(getDataFolder(), "systembadwords.txt");
 
         banWordsFile = new File(getDataFolder(), "badwords.yml");
@@ -450,7 +450,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 }
 
                 saveResource("systembadword.txt", false);
-                logger.info("Created systembadword.txt");
+                logger.info("创建系统资源");
                 if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
                     importDefaultBadWords();
                 }
