@@ -6,7 +6,7 @@
 
   <groupId>com.simplechat</groupId>
   <artifactId>SimpleChat</artifactId>
-  <version>1.13.4</version>
+  <version>1.14</version>
   <packaging>jar</packaging>
 
   <name>SimpleChat</name>
@@ -67,7 +67,7 @@
       <dependency>
           <groupId>io.papermc.paper</groupId>
           <artifactId>paper-api</artifactId>
-          <version>[1.17,)</version>
+          <version>[1.14,)</version>
           <scope>provided</scope>
       </dependency>
   </dependencies>

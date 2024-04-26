@@ -1,20 +1,23 @@
-package com.simplechat;
+/*package com.simplechat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.*;
+import com.simplechat.SimpleChat;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import static org.bukkit.Bukkit.getLogger;
 
 public class Updater {
-    int Version = 16;
-
+    int Version = 18;
+    private FileConfiguration banWordsConfig;
 
 
 
     public void UseUpdater() {
+
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
         try {
             Thread.sleep(10 * 60 * 1000); // 10分钟的毫秒数
@@ -57,5 +60,7 @@ public class Updater {
         }
 
     }
-}
 
+
+}
+*/
