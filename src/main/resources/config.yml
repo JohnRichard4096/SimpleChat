@@ -1,0 +1,6 @@
+banThreshold: 3
+banDuration: 5
+forbiddenWords:
+  - bad
+  - swear
+  - inappropriate
