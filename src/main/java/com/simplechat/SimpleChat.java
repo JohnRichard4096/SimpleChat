@@ -36,7 +36,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private  String LanguageConfig;
     private ResourceBundle bundle;
 
-    private int Version = 19;
+    private int Version = 20;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -375,36 +375,36 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         if (playerViolationCount.containsKey(targetPlayer) && playerMutedStatus.getOrDefault(targetPlayer ,false)) {
                             playerViolationCount.remove(targetPlayer);
                             playerMutedStatus.put(targetPlayer,true);
-                            sender.sendMessage("Successful to unMute player " + targetPlayer );
+                            sender.sendMessage(bundle.getString("UndoSuccess") + " " + "Player: " + targetPlayer );
                         } else {
                             sender.sendMessage("Player " + targetPlayer + " is not in MUTED.");
                         }
                     } else if (action.equalsIgnoreCase("unmute")) {
                         // 解禁逻辑
                         // 实现解禁逻辑，例如移除玩家的禁言状态
-                        // 在这里重新实现禁言逻辑，保留原来的禁言时间
+                        // 在这里重新实现禁言逻辑，保留原来的 禁言时间
                         if (playerViolationCount.containsKey(targetPlayer) && !playerMutedStatus.getOrDefault(targetPlayer,false)) {
                             int duration = playerViolationCount.get(targetPlayer);
                             playerMutedStatus.put(targetPlayer,false);
                             // 实现重新禁言逻辑，保留原来的禁言时间
                             // 例如：schatMutePlayer(targetPlayer, "重新禁言", duration);
-                            sender.sendMessage("Successful to reMute player " + targetPlayer + " for " + (duration == -1 ? "forever" : duration + "min"));
+                            sender.sendMessage(bundle.getString("UndoSuccess") +" " + targetPlayer + " Was muted " + (duration == -1 ? "forever" : duration + "min"));
                         } else {
                             sender.sendMessage("Player " + targetPlayer + " is not on muted.");
                         }
                     } else if (action.equalsIgnoreCase("restore")) {
                         // 还原违禁词列表逻辑
                         forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
-                        sender.sendMessage("Succeed to rollback list.");
+                        sender.sendMessage(bundle.getString("UndoSuccess"));
                     } else {
-                        sender.sendMessage("Error type,please type 'mute' or 'unmute' or 'restore'.");
+                        sender.sendMessage(bundle.getString("UndoCommandError"));
                     }
                 } else {
                     sender.sendMessage("Usage: /schat-undo <action> <player>");
                 }
                 return true;
             } else {
-                sender.sendMessage(bundle.getString("Have-no-permission") + "but OP");
+                sender.sendMessage(bundle.getString("Have-no-permission") + "(!OP)");
                 return true;
             }
         }
@@ -420,7 +420,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         playerMutedStatus.put(target.getName(),true);
                         sender.sendMessage("unMuted player " + target.getName() );
                     } else {
-                        sender.sendMessage("Cannot found player " + args[0] );
+                        sender.sendMessage(bundle.getString("CanNotFindPlayer") + args[0] );
                     }
                 } else {
                     sender.sendMessage("Usage: /schat-unmute <playerName>");
@@ -452,8 +452,8 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         sender.sendMessage("Page 1 / total: " + totalPages );
                         sender.sendMessage("Bad word: " + badWords);
                     } else {
-                        sender.sendMessage("Unable to read bad words.");
-                        logger.warning("Unable to read bad words.");
+                        sender.sendMessage(bundle.getString("CanNotRead"));
+                        logger.warning(bundle.getString("CanNotRead"));
                     }
                 } else if (args.length == 2 && args[0].equalsIgnoreCase("page")) {
                     if (banWordsFile.exists()) {
@@ -467,11 +467,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         try {
                             page = Integer.parseInt(args[1]);
                             if (page < 1 || page > totalPages) {
-                                sender.sendMessage("Please type page in " + totalPages );
+                                sender.sendMessage(bundle.getString("Page") + totalPages );
                                 return true;
                             }
                         } catch (NumberFormatException e) {
-                            sender.sendMessage("Please type page in." + totalPages);
+                            sender.sendMessage(bundle.getString("Page") + totalPages);
                             return true;
                         }
 
@@ -484,7 +484,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         sender.sendMessage("Page " + page + " total: " + totalPages + " pages");
                         sender.sendMessage("Bad word: " + badWords);
                     } else {
-                        sender.sendMessage("Can't read bad words.");
+                        sender.sendMessage(bundle.getString("CanNotRead"));
                     }
                 } else {
                     sender.sendMessage("Usage: /schat-list page <page>");
@@ -569,9 +569,9 @@ public class SimpleChat extends JavaPlugin implements Listener {
             if (sender.hasPermission("schat.addbadword") || sender.isOp()) {
                 if (args.length == 1) {
                     String newWord = args[0].toLowerCase();
-                    if (newWord == "*")
+                    if (newWord.equals("*"))
                     {
-                        sender.sendMessage("You cannot add word'*'!");
+                        sender.sendMessage(bundle.getString("CanNotAdd")+"*"+"!");
                     }
                     else if (!forbiddenWords.contains(newWord)) {
                         forbiddenWords.add(newWord);
@@ -581,8 +581,8 @@ public class SimpleChat extends JavaPlugin implements Listener {
                             sender.sendMessage("Add word '" + newWord + "' to list.");
                         } catch (IOException e) {
                             e.printStackTrace();
-                            sender.sendMessage("Something wrong while plugin was saving bad words!");
-                            logger.warning("Something wrong while plugin was saving bad words!");
+                            sender.sendMessage(bundle.getString("Save-Error"));
+                            logger.warning(bundle.getString("Save-Error"));
                         }
                     }
                 } else {
@@ -596,20 +596,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
 
         if (label.equalsIgnoreCase("schat")) {
-            sender.sendMessage("""
-                    Schat V1.14.1
-                    By JohnRicard4096
-                    Command Usage：
-                    '/schat' for usage menu
-                    '/schat-addbadword' add bad word
-                    '/schat-delbadword' remove bad word
-                    '/schat-reload' reload the plugin
-                    '/schat-list' list the bad word
-                    '/schat-mute <player> [reason] [time]' mute player
-                    '/schat-unmute <player>' unMute some player
-                    '/schat-undo <action> <player>' rollback some command
-                    '/schat-list page <num>' to some pages
-                    """);
+            sender.sendMessage(bundle.getString("help"));
 
         }
 
@@ -624,11 +611,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         banWordsConfig.set("forbiddenWords", forbiddenWords);
                         try {
                             banWordsConfig.save(banWordsFile);
-                            sender.sendMessage("remove all words!");
+                            sender.sendMessage(bundle.getString("rmAll"));
                         } catch (IOException e) {
                             e.printStackTrace();
-                            sender.sendMessage("Something wrong while plugin was saving bad words!");
-                            logger.warning("Something wrong while plugin was saving bad words!");
+                            sender.sendMessage(bundle.getString("Save-Error"));
+                            logger.warning(bundle.getString("Save-Error"));
                         }
                     } else {
                         if (forbiddenWords.contains(wordToRemove)) {
@@ -636,14 +623,14 @@ public class SimpleChat extends JavaPlugin implements Listener {
                             banWordsConfig.set("forbiddenWords", forbiddenWords);
                             try {
                                 banWordsConfig.save(banWordsFile);
-                                sender.sendMessage("Removed word '" + wordToRemove + "'.");
+                                sender.sendMessage(bundle.getString("RMWord") + wordToRemove + "'.");
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                sender.sendMessage("Something wrong while plugin was saving bad words!");
-                                logger.warning("Something wrong while plugin was saving bad words!");
+                                sender.sendMessage(bundle.getString("Save-Error"));
+                                logger.warning(bundle.getString("Save-Error"));
                             }
                         } else {
-                            sender.sendMessage("word '" + wordToRemove + "' was not in list.");
+                            sender.sendMessage(bundle.getString("word") +"'" + wordToRemove + "' " +bundle.getString("NotInList"));
                         }
                     }
                 } else {

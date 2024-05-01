@@ -1,5 +1,5 @@
 name: SimpleChat
-version: '1.14.1'
+version: '1.14.2-Pre'
 main: com.simplechat.SimpleChat
 api-version: '1.20'
 author: JohnRichard
@@ -27,7 +27,7 @@ commands:
   schat-mute:
     description: mute player
     permission: schat.mute
-    usage: /schat mute <playerName> [reason] [duration] 时间可以为1m 1d之类的
+    usage: /schat mute <playerName> [reason] [duration]
     default: op
 
   schat-unmute:
