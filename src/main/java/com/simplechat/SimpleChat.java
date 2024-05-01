@@ -32,7 +32,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private Map<String, Integer> playerViolationCount = new HashMap<>();
     private int violationThreshold;
     private int banDuration;
-    private String LanguageFile;
+    private String LanguageFile ="Languages/messages_en_global";
     private  String LanguageConfig;
     private ResourceBundle bundle = ResourceBundle.getBundle(LanguageFile);
 
@@ -47,7 +47,24 @@ public class SimpleChat extends JavaPlugin implements Listener {
         saveResource("Language/messages_zh_CN.properties", false);
         saveResource("Language/messages_en_global.properties", false);
 
+        // 打印操作系统信息
+        String osName = System.getProperty("os.name");
+        String osVersion = System.getProperty("os.version");
+        getLogger().info("Operating System: " + osName + " " + osVersion);
 
+        // 打印Java版本
+        String javaVersion = System.getProperty("java.version");
+        getLogger().info("Java Version: " + javaVersion);
+
+        // 打印运行时最大内存
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        String maxMemoryStr = maxMemory == Long.MAX_VALUE ? "N/A" : String.valueOf(maxMemory);
+        getLogger().info("Max Memory: " + maxMemoryStr);
+
+        // 打印运行时最小内存
+        long minMemory = Runtime.getRuntime().totalMemory();
+        String minMemoryStr = String.valueOf(minMemory);
+        getLogger().info("Min Memory: " + minMemoryStr);
 
        // Updater Updater = new Updater();	//实例化 类
         logger.info("Build Version:" + Version);
