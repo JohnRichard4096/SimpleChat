@@ -1,6 +1,6 @@
-name: SimpleChatReload
+name: SimpleChat
 version: '1.14.1'
-main: com.simplechat.SimpleChatReload
+main: com.simplechat.SimpleChat
 api-version: '1.20'
 author: JohnRichard
 
