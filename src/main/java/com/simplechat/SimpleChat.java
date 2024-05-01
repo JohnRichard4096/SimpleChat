@@ -34,7 +34,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private int banDuration;
     private String LanguageFile ="Languages/messages_en_global";
     private  String LanguageConfig;
-    private ResourceBundle bundle = ResourceBundle.getBundle(LanguageFile);
+    private ResourceBundle bundle;
 
     private int Version = 19;
     private static final Logger logger = Logger.getLogger("SimpleChat");
@@ -43,9 +43,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        loadConfig();
         Map<String, String> env = System.getenv();
-        saveResource("Language/messages_zh_CN.properties", false);
-        saveResource("Language/messages_en_global.properties", false);
+        saveResourceToFile("Language/messages_zh_CN.properties", "Language/messages_zh_CN.properties");
+        saveResourceToFile("Language/messages_en_global.properties", "Language/messages_en_global.properties");
 
         // 打印操作系统信息
         String osName = System.getProperty("os.name");
@@ -68,23 +69,21 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
        // Updater Updater = new Updater();	//实例化 类
         logger.info("Build Version:" + Version);
-        loadConfig();
-        loadBanWords();
+
+
         FileConfiguration config = getConfig();
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
         LanguageConfig = getConfig().getString("Language");
-        if(Objects.equals(LanguageConfig, "zh_CN")){
-            LanguageFile =  "Languages/messages_zh_CN";
-
-        }
-        else if (Objects.equals(LanguageConfig, "en_global")){
-            LanguageFile = "Languages/messages_en_global";
-        }
-        else {
+        if (Objects.equals(LanguageConfig, "zh_CN")) {
+            LanguageFile = "Language/messages_zh_CN";
+        } else if (Objects.equals(LanguageConfig, "en_global")) {
+            LanguageFile = "Language/messages_en_global";
+        } else {
             logger.warning("Wrong language in 'config.yml'!");
-            LanguageFile = "Languages/messages_en_global";
+            LanguageFile = "Language/messages_en_global";
         }
-
+        bundle = ResourceBundle.getBundle(LanguageFile);
+        loadBanWords();
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
 
@@ -161,6 +160,36 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     logger.info(bundle.getString("OnEnable"));
     }
+
+    private void saveResourceToFile(String resourceName, String targetPath) {
+        File targetFile = new File(getDataFolder().getParentFile(), targetPath);
+        if (targetFile.exists()) {
+            getLogger().info("Target file already exists: " + targetFile.getAbsolutePath());
+            return;
+        }
+
+        InputStream inputStream = getResource(resourceName);
+        if (inputStream == null) {
+            getLogger().warning("Resource not found: " + resourceName);
+            return;
+        }
+
+        if (!targetFile.getParentFile().exists()) {
+            targetFile.getParentFile().mkdirs();
+        }
+
+        try (OutputStream outputStream = new FileOutputStream(targetFile)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+            getLogger().info("Resource extracted to: " + targetFile.getAbsolutePath());
+        } catch (IOException e) {
+            getLogger().warning("Failed to extract resource: " + e.getMessage());
+        }
+    }
+
     @Override
     public void  onDisable(){
         getLogger().info(bundle.getString("OnDisable"));
@@ -567,7 +596,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
         if (label.equalsIgnoreCase("schat")) {
             sender.sendMessage("""
-                    Schat V1.14
+                    Schat V1.14.1
                     By JohnRicard4096
                     Command Usage：
                     '/schat' for usage menu
