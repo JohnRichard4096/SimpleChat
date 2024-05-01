@@ -73,7 +73,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
         FileConfiguration config = getConfig();
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
-        LanguageConfig = getConfig().getString("Language");
+        LanguageConfig = getConfig().getString("banConfiguration.Language");
         if (Objects.equals(LanguageConfig, "zh_CN")) {
             LanguageFile = "Language/messages_zh_CN";
         } else if (Objects.equals(LanguageConfig, "en_global")) {
