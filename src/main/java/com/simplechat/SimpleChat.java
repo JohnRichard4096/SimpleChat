@@ -67,7 +67,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         getLogger().info("Min Memory: " + minMemoryStr);
 
        // Updater Updater = new Updater();	//实例化 类
-
+        logger.info("Build Version:" + Version);
         loadConfig();
         loadBanWords();
         FileConfiguration config = getConfig();
