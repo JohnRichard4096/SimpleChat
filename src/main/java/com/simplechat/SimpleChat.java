@@ -505,15 +505,15 @@ public class SimpleChat extends JavaPlugin implements Listener {
             if (sender.hasPermission("schat.reload") || sender.isOp()) {
                 LanguageConfig = getConfig().getString("banConfiguration.Language");
                 if(Objects.equals(LanguageConfig, "zh_CN")){
-                    LanguageFile =  "Languages/messages_zh_CN";
+                    LanguageFile =  "Language/messages_zh_CN";
 
                 }
                 else if (Objects.equals(LanguageConfig, "en_global")){
-                    LanguageFile = "Languages/messages_en_global";
+                    LanguageFile = "Language/messages_en_global";
                 }
                 else {
                     logger.warning("Wrong language in 'config.yml'!");
-                    LanguageFile = "Languages/messages_en_global";
+                    LanguageFile = "Language/messages_en_global";
                 }
                 bundle = ResourceBundle.getBundle(LanguageFile);
                 loadConfig();
