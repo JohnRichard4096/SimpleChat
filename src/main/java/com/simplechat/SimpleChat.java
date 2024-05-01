@@ -503,7 +503,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
         if (label.equalsIgnoreCase("schat-reload") ) { //显而易见，重载
             if (sender.hasPermission("schat.reload") || sender.isOp()) {
-                LanguageConfig = getConfig().getString("Language");
+                LanguageConfig = getConfig().getString("banConfiguration.Language");
                 if(Objects.equals(LanguageConfig, "zh_CN")){
                     LanguageFile =  "Languages/messages_zh_CN";
 
@@ -515,6 +515,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     logger.warning("Wrong language in 'config.yml'!");
                     LanguageFile = "Languages/messages_en_global";
                 }
+                bundle = ResourceBundle.getBundle(LanguageFile);
                 loadConfig();
                 loadBanWords();
 
