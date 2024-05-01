@@ -1,6 +1,6 @@
 package com.simplechat;
+
 import org.bukkit.Bukkit;
-import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,23 +10,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
-import java.util.*;
-
-import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Logger;
-import java.text.SimpleDateFormat;
 
 
 public class SimpleChat extends JavaPlugin implements Listener {
@@ -42,7 +36,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private  String LanguageConfig;
     private ResourceBundle bundle = ResourceBundle.getBundle(LanguageFile);
 
-    private int Version = 18;
+    private int Version = 19;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -50,6 +44,8 @@ public class SimpleChat extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         Map<String, String> env = System.getenv();
+        saveResource("Language/messages_zh_CN.properties", false);
+        saveResource("Language/messages_en_global.properties", false);
 
         // 打印操作系统信息
         String osName = System.getProperty("os.name");
@@ -77,11 +73,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
         FileConfiguration config = getConfig();
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
         LanguageConfig = getConfig().getString("Language");
-        if(LanguageConfig == "zh_CN"){
+        if(Objects.equals(LanguageConfig, "zh_CN")){
             LanguageFile =  "Languages/messages_zh_CN";
 
         }
-        else if (LanguageConfig == "en_global"){
+        else if (Objects.equals(LanguageConfig, "en_global")){
             LanguageFile = "Languages/messages_en_global";
         }
         else {
