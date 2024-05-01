@@ -504,11 +504,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
         if (label.equalsIgnoreCase("schat-reload") ) { //显而易见，重载
             if (sender.hasPermission("schat.reload") || sender.isOp()) {
                 LanguageConfig = getConfig().getString("Language");
-                if(LanguageConfig == "zh_CN"){
+                if(Objects.equals(LanguageConfig, "zh_CN")){
                     LanguageFile =  "Languages/messages_zh_CN";
 
                 }
-                else if (LanguageConfig == "en_global"){
+                else if (Objects.equals(LanguageConfig, "en_global")){
                     LanguageFile = "Languages/messages_en_global";
                 }
                 else {
@@ -524,11 +524,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 }
 
                 saveResource("systembadword.txt", false);
-                logger.info("创建系统资源");
+                logger.info(bundle.getString("Reload"));
                 if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
                     importDefaultBadWords();
                 }
-                sender.sendMessage("重载完成.");
+                sender.sendMessage(bundle.getString("Reload"));
                 String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 executor.submit(() -> {
