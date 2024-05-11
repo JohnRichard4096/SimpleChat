@@ -32,7 +32,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private Map<String, Integer> playerViolationCount = new HashMap<>();
     private int violationThreshold;
     private int banDuration;
-    private String LanguageFile ="Languages/messages_en_global";
+    private String LanguageFile ="Language/messages_en_global";
     private  String LanguageConfig;
     private ResourceBundle bundle;
 
