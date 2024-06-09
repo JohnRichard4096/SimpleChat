@@ -1,0 +1,7 @@
+banConfiguration:
+  enableDefaultBadWords: false
+  importDefaultBadWords: false
+  violationThreshold: 3
+  banDuration: 6000
+  Language: "en_global"
+#Language,You can choose "zh_CN" or "en_global"
