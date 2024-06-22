@@ -1,32 +1,34 @@
-/*package com.simplechat;
+package com.simplechat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ResourceBundle;
 import java.util.concurrent.*;
 import com.simplechat.SimpleChat;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.intellij.lang.annotations.Language;
 
 import static org.bukkit.Bukkit.getLogger;
 
 public class Updater {
-    int Version = 18;
+    static int Version = 21;
     private FileConfiguration banWordsConfig;
-
-
-
-    public void UseUpdater() {
-
+    static SimpleChat simpleChat = new SimpleChat();
+    static ResourceBundle bundle;
+    private static String LangFile = simpleChat.LanguageFile;
+    public static void UseUpdater() {
+         bundle = ResourceBundle.getBundle(LangFile);
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
         try {
-            Thread.sleep(10 * 60 * 1000); // 10分钟的毫秒数
+            Thread.sleep(10 * 60 * 3000); // 30分钟的毫秒数
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         while (true) {
             try {
-                Thread.sleep(10 * 60 * 1000); // 10分钟的毫秒数
+                Thread.sleep(10 * 60 * 3000); // 30分钟的毫秒数
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -38,21 +40,21 @@ public class Updater {
                         String versionStr = reader.readLine();
                         if (versionStr != null) {
                             int version = Integer.parseInt(versionStr);
-                            if (version < Version) {
-                                getLogger().warning("你已经落后" + (Version - version) + "个开发版本了！");
-                            } else if (version > Version) {
-                                getLogger().warning("这是哪个版本？自己构建的？！");
-                            } else if (version == Version) {
-                                getLogger().info("您正在运行最新版本");
+                            if (version > Version) {
+                                getLogger().warning(bundle.getString("URAlready") + (version - Version) + bundle.getString("BuildVersion"));
+                            } else if (version < Version) {
+                                getLogger().warning(bundle.getString("WhatThis"));
+                            } else if (version == Version){
+                                getLogger().info(bundle.getString("NewestVersion"));
                             }
                         } else {
-                            getLogger().warning("无法从版本号文件中读取版本号");
+                            getLogger().warning(bundle.getString("CannotGetVersion"));
                         }
                     } catch (IOException | NumberFormatException e) {
-                        getLogger().warning("无法读取或解析版本号");
+                        getLogger().warning(bundle.getString("unableToRead"));
                     }
                 } catch (MalformedURLException e) {
-                    getLogger().warning("无法获取版本！");
+                    getLogger().warning(bundle.getString("unableToGet"));
                 }
             });
             executor.shutdown();
@@ -63,4 +65,3 @@ public class Updater {
 
 
 }
-*/

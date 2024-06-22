@@ -33,11 +33,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private Map<String, Integer> playerViolationCount = new HashMap<>();
     private int violationThreshold;
     private int banDuration;
-    private String LanguageFile ="Language/messages_en_global";
+    public String LanguageFile ="Language/messages_en_global";
     private  String LanguageConfig;
     private ResourceBundle bundle;
 
-    private int Version = 20;
+    private int Version = 21;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -80,10 +80,12 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 Loading plugin......
                 """);
         System.out.println("""
+                *
                  |---------------------------------------------------------------------|
-                 |SimpleChat Build:20                                                  |
+                 |SimpleChat Build:21                                                  |
                  |View https://github.com/JohnRichard/SimpleChat/ to get newest plugin!|
                  |---------------------------------------------------------------------|
+                 *
                 """);
         FileConfiguration config = getConfig();
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
@@ -123,7 +125,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             } catch (MalformedURLException e) {
                 getLogger().warning(bundle.getString("unableToGet"));
             }
-            //Updater.UseUpdater();
+            Updater.UseUpdater();
         });
         executor.shutdown();
 
