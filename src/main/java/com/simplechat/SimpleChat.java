@@ -76,7 +76,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
        // Updater Updater = new Updater();	//实例化 类
         logger.info("Build Version:" + Version);
         System.out.println("""
-                SIMPLE CHAT 1.14.2
+                SIMPLE CHAT 1.14.3
                 Loading plugin......
                 """);
         System.out.println("""
@@ -220,7 +220,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             getLogger().warning(bundle.getString("ResourcesUnload-err-Already"));
         }
         System.out.println("""
-                SIMPLE CHAT 1.14.2
+                SIMPLE CHAT 1.14.3
                 Now unloaded plugin!
                 Bye.
                 """);
@@ -625,7 +625,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
         if (label.equalsIgnoreCase("schat")) {
             sender.sendMessage("""
-                    Schat V1.14.2
+                    Schat V1.14.3
                     By JohnRicard4096
                     Command Usage：
                     '/schat' for usage menu
