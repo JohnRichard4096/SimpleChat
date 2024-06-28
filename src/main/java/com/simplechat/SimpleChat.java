@@ -54,6 +54,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
          */
         saveResource("Language/messages_zh_CN.properties", true);
         saveResource("Language/messages_en_global.properties", true);
+        saveResource("Language/messages_ru_RU.properties",true);
         // 打印操作系统信息
         String osName = System.getProperty("os.name");
         String osVersion = System.getProperty("os.version");
@@ -94,10 +95,14 @@ public class SimpleChat extends JavaPlugin implements Listener {
         FileConfiguration config = getConfig();
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
         LanguageConfig = config.getString("banConfiguration.Language");
-        if (Objects.equals(LanguageConfig, "zh_CN")) {
-            LanguageFile = "Language/messages_zh_CN";
-        } else if (Objects.equals(LanguageConfig, "en_global")) {
+        if(Objects.equals(LanguageConfig, "zh_CN")){
+            LanguageFile =  "Language/messages_zh_CN";
+
+        }
+        else if (Objects.equals(LanguageConfig, "en_global")){
             LanguageFile = "Language/messages_en_global";
+        } else if (Objects.equals(LanguageConfig,"ru_RU")) {
+            LanguageFile = "Language/messages_ru_RU";
         } else {
             logger.warning("Wrong language in 'config.yml'!");
             LanguageFile = "Language/messages_en_global";
@@ -180,7 +185,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     logger.info(bundle.getString("OnEnable"));
     }
-
+/*
     private void saveResourceToFile(String resourceName, String targetPath) {
         File targetFile = new File(getDataFolder().getParentFile(), targetPath);
         if (targetFile.exists()) {
@@ -210,6 +215,8 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
     }
 
+
+ */
     @Override
     public void  onDisable(){
         getLogger().info(bundle.getString("OnDisable"));
@@ -536,6 +543,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             if (sender.hasPermission("schat.reload") || sender.isOp()) {
                 saveResource("Language/messages_zh_CN.properties", true);
                 saveResource("Language/messages_en_global.properties", true);
+                saveResource("Language/messages_ru_RU.properties",true);
                 LanguageConfig = getConfig().getString("banConfiguration.Language");
                 if(Objects.equals(LanguageConfig, "zh_CN")){
                     LanguageFile =  "Language/messages_zh_CN";
@@ -543,8 +551,9 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 }
                 else if (Objects.equals(LanguageConfig, "en_global")){
                     LanguageFile = "Language/messages_en_global";
-                }
-                else {
+                } else if (Objects.equals(LanguageConfig,"ru_RU")) {
+                    LanguageFile = "Language/messages_ru_RU";
+                } else {
                     logger.warning("Wrong language in 'config.yml'!");
                     LanguageFile = "Language/messages_en_global";
                 }
