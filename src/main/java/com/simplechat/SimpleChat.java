@@ -37,7 +37,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private  String LanguageConfig;
     private ResourceBundle bundle;
 
-    private int Version = 21;
+    private int Version = 23;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -76,16 +76,20 @@ public class SimpleChat extends JavaPlugin implements Listener {
        // Updater Updater = new Updater();	//实例化 类
         logger.info("Build Version:" + Version);
         System.out.println("""
-                SIMPLE CHAT 1.14.3
+                
+                SIMPLE CHAT 1.14.4
                 Loading plugin......
+                
                 """);
         System.out.println("""
+                
                 *
                  |---------------------------------------------------------------------|
-                 |SimpleChat Build:21                                                  |
+                 |SimpleChat Build:23                                                  |
                  |View https://github.com/JohnRichard/SimpleChat/ to get newest plugin!|
                  |---------------------------------------------------------------------|
                  *
+                
                 """);
         FileConfiguration config = getConfig();
         String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
@@ -136,7 +140,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             badWordFile.delete();
         }
 
-        saveResource("systembadword.txt", false);
+        saveResource("systembadword.txt", true);
         logger.info(bundle.getString("SystemTXT"));
         File txtFile = new File(getDataFolder(), "systembadwords.txt");
 
@@ -220,9 +224,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
             getLogger().warning(bundle.getString("ResourcesUnload-err-Already"));
         }
         System.out.println("""
-                SIMPLE CHAT 1.14.3
+                
+                SIMPLE CHAT 1.14.4
                 Now unloaded plugin!
                 Bye.
+                
                 """);
     }
     private void loadBanWords() {
@@ -373,7 +379,6 @@ public class SimpleChat extends JavaPlugin implements Listener {
                             String reason = args.length >= 2 ? args[1] : "N/A";
                             int duration = args.length >= 3 ? Integer.parseInt(args[2]) : -1; // 默认为永久禁言
                             playerMutedStatus.put(target.getName(),false);
-
                             sender.sendMessage("Muted player:'" + target.getName() + "'because " + reason + "for " + (duration == -1 ? "forever" : duration + "min"));
                         }
 
@@ -625,7 +630,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
         if (label.equalsIgnoreCase("schat")) {
             sender.sendMessage("""
-                    Schat V1.14.3
+                    Schat V1.14.4
                     By JohnRicard4096
                     Command Usage：
                     '/schat' for usage menu
