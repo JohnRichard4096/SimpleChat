@@ -239,9 +239,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
             if (badWordsStream != null) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(badWordsStream))) {
-                    List<String> defaultBadWords = Arrays.asList(reader.readLine().split(","));
-                    for (String word : defaultBadWords) {
-                        String newWord = word.trim().toLowerCase();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        // 逐行读取直到没有更多行
+                        String newWord = line.trim().toLowerCase();
                         if (!forbiddenWords.contains(newWord)) {
                             forbiddenWords.add(newWord);
                         }
@@ -249,7 +250,6 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     banWordsConfig.set("forbiddenWords", forbiddenWords);
                     banWordsConfig.save(banWordsFile);
                 } catch (IOException e) {
-
                     logger.warning(bundle.getString("CannotReadResourcesPack"));
                 }
             } else {
