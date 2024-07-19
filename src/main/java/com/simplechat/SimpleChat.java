@@ -37,7 +37,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private  String LanguageConfig;
     private ResourceBundle bundle;
 
-    private int Version = 25;
+    private int Version = 28;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
