@@ -37,7 +37,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private  String LanguageConfig;
     private ResourceBundle bundle;
 
-    private int Version = 23;
+    private int Version = 25;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -78,7 +78,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         logger.info("Build Version:" + Version);
         System.out.println("""
                 
-                SIMPLE CHAT 1.14.4
+                SIMPLE CHAT 1.14.5
                 Loading plugin......
                 
                 """);
@@ -86,7 +86,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 
                 *
                  |---------------------------------------------------------------------|
-                 |SimpleChat Build:23                                                  |
+                 |SimpleChat Build:28                                                 |
                  |View https://github.com/JohnRichard/SimpleChat/ to get newest plugin!|
                  |---------------------------------------------------------------------|
                  *
@@ -139,15 +139,8 @@ public class SimpleChat extends JavaPlugin implements Listener {
         executor.shutdown();
 
 
-        InputStream inputStream = getClass().getResourceAsStream("/badwords.yml");
-        File badWordFile = new File(getDataFolder(), "systembadword.txt");
-        if (badWordFile.exists()) {
-            badWordFile.delete();
-        }
-
         saveResource("systembadword.txt", true);
         logger.info(bundle.getString("SystemTXT"));
-        File txtFile = new File(getDataFolder(), "systembadwords.txt");
 
         banWordsFile = new File(getDataFolder(), "badwords.yml");
         getLogger().info(bundle.getString("BoardCast-Release"));
@@ -163,25 +156,8 @@ public class SimpleChat extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
         // 在创建badwords.yml文件时检查是否导入内置违禁词列表
-        try {
-            if (banWordsFile.createNewFile()) {
-                if (getConfig().getBoolean("banConfiguration.importDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.enableDefaultBadWords",true)) {
-                    // 导入内置违禁词列表
-                    List<String> defaultBadWords = Arrays.asList("badword1", "badword2", "badword3");
-                    banWordsConfig.set("forbiddenWords", defaultBadWords);
-                    try {
-                        banWordsConfig.save(banWordsFile);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            } else {
-                // 文件已存在，加载现有的违禁词列表
-                loadBanWords();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        loadBanWords();
+        importDefaultBadWords();
 
     logger.info(bundle.getString("OnEnable"));
     }
@@ -232,7 +208,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
         }
         System.out.println("""
                 
-                SIMPLE CHAT 1.14.4
+                SIMPLE CHAT 1.14.5
                 Now unloaded plugin!
                 Bye.
                 
@@ -251,10 +227,6 @@ public class SimpleChat extends JavaPlugin implements Listener {
             forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
         }
 
-        // 根据配置决定是否加载默认敏感词
-        if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
-            importDefaultBadWords();
-        }
     }
 
 
@@ -262,7 +234,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
 
     private void importDefaultBadWords() {
-        if (getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
+        if (getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)&&getConfig().getBoolean("banConfiguration.enableDefaultBadWords",true)) {
             InputStream badWordsStream = getClass().getResourceAsStream("/systembadword.txt");
 
             if (badWordsStream != null) {
@@ -356,7 +328,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     getServer().getScheduler().runTaskLater(this, () -> {
                         playerViolationCount.put(playerName, 0);
                         event.getPlayer().sendMessage(bundle.getString("PlayerMutedStatusFalse"));
-                        playerMutedStatus.put(playerName, true);
+                        playerMutedStatus.remove(playerName);
                     }, banDuration);
                     return;
                 }
@@ -375,271 +347,264 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        switch (label){
+            case "schat-mute" -> {
+                if (sender.hasPermission("schat.mute") || sender.isOp()) {
+                    if (args.length >= 1) {
+                        Player target = Bukkit.getPlayer(args[0]);
+                        if (target != null ) {
+                            // 获取禁言原因和时长
+                            if(!playerMutedStatus.getOrDefault(target.getName(),false)){
+                                String reason = args.length >= 2 ? args[1] : "N/A";
+                                int duration = args.length >= 3 ? Integer.parseInt(args[2]) : -1; // 默认为永久禁言
+                                playerMutedStatus.put(target.getName(),false);
+                                sender.sendMessage("Muted player:'" + target.getName() + "'because " + reason + "for " + (duration == -1 ? "forever" : duration + "min"));
+                            }
 
-        if (label.equalsIgnoreCase("schat-mute") ) {
-            if (sender.hasPermission("schat.mute") || sender.isOp()) {
-                if (args.length >= 1) {
-                    Player target = Bukkit.getPlayer(args[0]);
-                    if (target != null ) {
-                        // 获取禁言原因和时长
-                        if(!playerMutedStatus.getOrDefault(target.getName(),false)){
-                            String reason = args.length >= 2 ? args[1] : "N/A";
-                            int duration = args.length >= 3 ? Integer.parseInt(args[2]) : -1; // 默认为永久禁言
-                            playerMutedStatus.put(target.getName(),false);
-                            sender.sendMessage("Muted player:'" + target.getName() + "'because " + reason + "for " + (duration == -1 ? "forever" : duration + "min"));
-                        }
-
-                    } else {
-                        sender.sendMessage("Player " + args[0] + " not ONLINE.");
-                    }
-                } else {
-                    sender.sendMessage("Usage: /schat-mute <playerName> [reason] [duration]");
-                }
-                return true;
-            } else {
-                sender.sendMessage(bundle.getString("Have-no-permission"));
-                return true;
-            }
-        }
-
-        if (label.equalsIgnoreCase("schat-undo")) {
-            if (sender.isOp()) {
-                if (args.length >= 2) {
-                    String action = args[0];
-                    String targetPlayer = args[1];
-
-                    if (action.equalsIgnoreCase("mute")) {
-                        // 撤销禁言逻辑
-                        if (playerViolationCount.containsKey(targetPlayer) && playerMutedStatus.getOrDefault(targetPlayer ,false)) {
-                            playerViolationCount.remove(targetPlayer);
-                            playerMutedStatus.put(targetPlayer,true);
-                            sender.sendMessage("Successful to unMute player " + targetPlayer );
                         } else {
-                            sender.sendMessage("Player " + targetPlayer + " is not in MUTED.");
+                            sender.sendMessage("Player " + args[0] + " not ONLINE.");
                         }
-                    } else if (action.equalsIgnoreCase("unmute")) {
-                        // 解禁逻辑
-                        // 实现解禁逻辑，例如移除玩家的禁言状态
-                        // 在这里重新实现禁言逻辑，保留原来的禁言时间
-                        if (playerViolationCount.containsKey(targetPlayer) && !playerMutedStatus.getOrDefault(targetPlayer,false)) {
-                            int duration = playerViolationCount.get(targetPlayer);
-                            playerMutedStatus.put(targetPlayer,false);
-                            // 实现重新禁言逻辑，保留原来的禁言时间
-                            // 例如：schatMutePlayer(targetPlayer, "重新禁言", duration);
-                            sender.sendMessage("Successful to reMute player " + targetPlayer + " for " + (duration == -1 ? "forever" : duration + "min"));
+                    } else {
+                        sender.sendMessage("Usage: /schat-mute <playerName> [reason] [duration]");
+                    }
+                    return true;
+                } else {
+                    sender.sendMessage(bundle.getString("Have-no-permission"));
+                    return true;
+                }
+            }
+
+            case "schat-undo" -> {
+                if (sender.isOp()) {
+                    if (args.length >= 2) {
+                        String action = args[0];
+                        String targetPlayer = args[1];
+
+                        if (action.equalsIgnoreCase("mute")) {
+                            // 撤销禁言逻辑
+                            if (playerViolationCount.containsKey(targetPlayer) && playerMutedStatus.getOrDefault(targetPlayer ,false)) {
+                                playerViolationCount.remove(targetPlayer);
+                                playerMutedStatus.put(targetPlayer,true);
+                                sender.sendMessage("Successful to unMute player " + targetPlayer );
+                            } else {
+                                sender.sendMessage("Player " + targetPlayer + " is not in MUTED.");
+                            }
+                        } else if (action.equalsIgnoreCase("unmute")) {
+                            // 解禁逻辑
+                            // 实现解禁逻辑，例如移除玩家的禁言状态
+                            // 在这里重新实现禁言逻辑，保留原来的禁言时间
+                            if (playerViolationCount.containsKey(targetPlayer) && !playerMutedStatus.getOrDefault(targetPlayer,false)) {
+                                int duration = playerViolationCount.get(targetPlayer);
+                                playerMutedStatus.put(targetPlayer,false);
+                                // 实现重新禁言逻辑，保留原来的禁言时间
+                                // 例如：schatMutePlayer(targetPlayer, "重新禁言", duration);
+                                sender.sendMessage("Successful to reMute player " + targetPlayer + " for " + (duration == -1 ? "forever" : duration + "min"));
+                            } else {
+                                sender.sendMessage("Player " + targetPlayer + " is not on muted.");
+                            }
+                        } else if (action.equalsIgnoreCase("restore")) {
+                            // 还原违禁词列表逻辑
+                            forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
+                            sender.sendMessage("Succeed to rollback list.");
                         } else {
-                            sender.sendMessage("Player " + targetPlayer + " is not on muted.");
+                            sender.sendMessage("Error type,please type 'mute' or 'unmute' or 'restore'.");
                         }
-                    } else if (action.equalsIgnoreCase("restore")) {
-                        // 还原违禁词列表逻辑
-                        forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
-                        sender.sendMessage("Succeed to rollback list.");
                     } else {
-                        sender.sendMessage("Error type,please type 'mute' or 'unmute' or 'restore'.");
+                        sender.sendMessage("Usage: /schat-undo <action> <player>");
                     }
+                    return true;
                 } else {
-                    sender.sendMessage("Usage: /schat-undo <action> <player>");
+                    sender.sendMessage(bundle.getString("Have-no-permission") + "but OP");
+                    return true;
                 }
-                return true;
-            } else {
-                sender.sendMessage(bundle.getString("Have-no-permission") + "but OP");
-                return true;
             }
-        }
 
 
-        if (label.equalsIgnoreCase("schat-unmute") ) {
-            if (sender.hasPermission("schat.unmute") || sender.isOp()) {
-                if (args.length == 1) {
-                    Player target = Bukkit.getPlayer(args[0]);
-                    if (target != null && playerMutedStatus.getOrDefault(target.getName(),false) ) {
-                        // 执行解除禁言逻辑
-                        playerViolationCount.put(target.getName(), 0); // 将该玩家的违规次数设为0，解除禁言
-                        playerMutedStatus.put(target.getName(),true);
-                        sender.sendMessage("unMuted player " + target.getName() );
+            case "schat-unmute" -> {
+                if (sender.hasPermission("schat.unmute") || sender.isOp()) {
+                    if (args.length == 1) {
+                        Player target = Bukkit.getPlayer(args[0]);
+                        if (target != null && playerMutedStatus.getOrDefault(target.getName(),false) ) {
+                            // 执行解除禁言逻辑
+                            playerViolationCount.put(target.getName(), 0); // 将该玩家的违规次数设为0，解除禁言
+                            playerMutedStatus.remove(target.getName());
+                            sender.sendMessage("unMuted player " + target.getName() );
+                        } else {
+                            sender.sendMessage("Cannot found player " + args[0] );
+                        }
                     } else {
-                        sender.sendMessage("Cannot found player " + args[0] );
+                        sender.sendMessage("Usage: /schat-unmute <playerName>");
                     }
+                    return true;
                 } else {
-                    sender.sendMessage("Usage: /schat-unmute <playerName>");
+                    sender.sendMessage(bundle.getString("Have-no-permission"));
+                    return true;
                 }
-                return true;
-            } else {
-                sender.sendMessage(bundle.getString("Have-no-permission"));
-                return true;
             }
-        }
 
 
-        if (label.equalsIgnoreCase("schat-list") ) { //列出违禁词，读取指令
-            if (sender.isOp()) {
-                if (args.length == 0) {
-                    if (banWordsFile.exists()) {
-                        YamlConfiguration banWordsConfig = YamlConfiguration.loadConfiguration(banWordsFile);
-                        List<String> forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
-                        //从yaml中读取
-                        int pageSize = 20;//一页的显示数量
-                        int totalPages = (int) Math.ceil((double) forbiddenWords.size() / pageSize);
-                        //起始页
-                        int startIndex = 0;
-                        int endIndex = Math.min(startIndex + pageSize, forbiddenWords.size());
+            case "schat-list" -> { //列出违禁词，读取指令
+                if (sender.isOp()) {
+                    if (args.length == 0) {
+                        if (banWordsFile.exists()) {
+                            YamlConfiguration banWordsConfig = YamlConfiguration.loadConfiguration(banWordsFile);
+                            List<String> forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
+                            //从yaml中读取
+                            int pageSize = 20;//一页的显示数量
+                            int totalPages = (int) Math.ceil((double) forbiddenWords.size() / pageSize);
+                            //起始页
+                            int startIndex = 0;
+                            int endIndex = Math.min(startIndex + pageSize, forbiddenWords.size());
 
-                        List<String> wordsToShow = forbiddenWords.subList(startIndex, endIndex);
-                        String badWords = String.join(", ", wordsToShow);
+                            List<String> wordsToShow = forbiddenWords.subList(startIndex, endIndex);
+                            String badWords = String.join(", ", wordsToShow);
 
-                        sender.sendMessage("Page 1 / total: " + totalPages );
-                        sender.sendMessage("Bad word: " + badWords);
-                    } else {
-                        sender.sendMessage("Unable to read bad words.");
-                        logger.warning("Unable to read bad words.");
-                    }
-                } else if (args.length == 2 && args[0].equalsIgnoreCase("page")) {
-                    if (banWordsFile.exists()) {
-                        YamlConfiguration banWordsConfig = YamlConfiguration.loadConfiguration(banWordsFile);
-                        List<String> forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
+                            sender.sendMessage("Page 1 / total: " + totalPages );
+                            sender.sendMessage("Bad word: " + badWords);
+                        } else {
+                            sender.sendMessage("Unable to read bad words.");
+                            logger.warning("Unable to read bad words.");
+                        }
+                    } else if (args.length == 2 && args[0].equalsIgnoreCase("page")) {
+                        if (banWordsFile.exists()) {
+                            YamlConfiguration banWordsConfig = YamlConfiguration.loadConfiguration(banWordsFile);
+                            List<String> forbiddenWords = banWordsConfig.getStringList("forbiddenWords");
 
-                        int pageSize = 20;
-                        int totalPages = (int) Math.ceil((double) forbiddenWords.size() / pageSize);
+                            int pageSize = 20;
+                            int totalPages = (int) Math.ceil((double) forbiddenWords.size() / pageSize);
 
-                        int page;
-                        try {
-                            page = Integer.parseInt(args[1]);
-                            if (page < 1 || page > totalPages) {
-                                sender.sendMessage("Please type page in " + totalPages );
+                            int page;
+                            try {
+                                page = Integer.parseInt(args[1]);
+                                if (page < 1 || page > totalPages) {
+                                    sender.sendMessage("Please type page in " + totalPages );
+                                    return true;
+                                }
+                            } catch (NumberFormatException e) {
+                                sender.sendMessage("Please type page in." + totalPages);
                                 return true;
                             }
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage("Please type page in." + totalPages);
-                            return true;
+
+                            int startIndex = (page - 1) * pageSize;
+                            int endIndex = Math.min(startIndex + pageSize, forbiddenWords.size());
+
+                            List<String> wordsToShow = forbiddenWords.subList(startIndex, endIndex);
+                            String badWords = String.join(", ", wordsToShow);
+
+                            sender.sendMessage("Page " + page + " total: " + totalPages + " pages");
+                            sender.sendMessage("Bad word: " + badWords);
+                        } else {
+                            sender.sendMessage("Can't read bad words.");
                         }
-
-                        int startIndex = (page - 1) * pageSize;
-                        int endIndex = Math.min(startIndex + pageSize, forbiddenWords.size());
-
-                        List<String> wordsToShow = forbiddenWords.subList(startIndex, endIndex);
-                        String badWords = String.join(", ", wordsToShow);
-
-                        sender.sendMessage("Page " + page + " total: " + totalPages + " pages");
-                        sender.sendMessage("Bad word: " + badWords);
                     } else {
-                        sender.sendMessage("Can't read bad words.");
+                        sender.sendMessage("Usage: /schat-list page <page>");
                     }
+                    return true;
                 } else {
-                    sender.sendMessage("Usage: /schat-list page <page>");
+                    sender.sendMessage(bundle.getString("Have-no-permission")+ "(OP)");
+                    return true;
                 }
-                return true;
-            } else {
-                sender.sendMessage(bundle.getString("Have-no-permission")+ "(OP)");
-                return true;
             }
-        }
 
 
 
 
 
 
-        if (label.equalsIgnoreCase("schat-reload") ) { //显而易见，重载
-            if (sender.hasPermission("schat.reload") || sender.isOp()) {
-                saveResource("Language/messages_zh_CN.properties", true);
-                saveResource("Language/messages_en_global.properties", true);
-                saveResource("Language/messages_ru_RU.properties",true);
-                LanguageConfig = getConfig().getString("banConfiguration.Language");
-                if(Objects.equals(LanguageConfig, "zh_CN")){
-                    LanguageFile =  "Language/messages_zh_CN";
+            case "schat-reload" -> { //显而易见，重载
+                if (sender.hasPermission("schat.reload") || sender.isOp()) {
+                    saveResource("systembadword.txt", true);
+                    loadConfig();
+                    loadBanWords();
+                    saveResource("Language/messages_zh_CN.properties", true);
+                    saveResource("Language/messages_en_global.properties", true);
+                    saveResource("Language/messages_ru_RU.properties",true);
+                    LanguageConfig = getConfig().getString("banConfiguration.Language");
+                    if(Objects.equals(LanguageConfig, "zh_CN")){
+                        LanguageFile =  "Language/messages_zh_CN";
 
-                }
-                else if (Objects.equals(LanguageConfig, "en_global")){
-                    LanguageFile = "Language/messages_en_global";
-                } else if (Objects.equals(LanguageConfig,"ru_RU")) {
-                    LanguageFile = "Language/messages_ru_RU";
-                } else {
-                    logger.warning("Wrong language in 'config.yml'!");
-                    LanguageFile = "Language/messages_en_global";
-                }
-                bundle = ResourceBundle.getBundle(LanguageFile);
-                loadConfig();
-                loadBanWords();
-
-                File badWordFile = new File(getDataFolder(), "systembadword.txt");
-                if (badWordFile.exists()) {
-                    badWordFile.delete();
-                }
-
-                saveResource("systembadword.txt", false);
-
-                if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
-                    importDefaultBadWords();
-                }
-                logger.info(bundle.getString("Reload"));
-                String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                executor.submit(() -> {
-
-                    try {
-                        URL url = new URL(versionUrl);
-                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-                            String versionStr = reader.readLine();
-                            if (versionStr != null) {
-                                int version = Integer.parseInt(versionStr);
-                                if (version > Version) {
-                                    getLogger().warning(bundle.getString("URAlready") + (version - Version) + bundle.getString("BuildVersion"));
-                                } else if (version < Version) {
-                                    getLogger().warning(bundle.getString("WhatThis"));
-                                } else if (version == Version){
-                                    getLogger().info(bundle.getString("NewestVersion"));
-                                }
-                            } else {
-                                getLogger().warning(bundle.getString("CannotGetVersion"));
-                            }
-                        } catch (IOException | NumberFormatException e) {
-                            getLogger().warning(bundle.getString("unableToRead"));
-                        }
-                    } catch (MalformedURLException e) {
-                        getLogger().warning(bundle.getString("unableToGet"));
                     }
-                    //Updater.UseUpdater();
-                });
-                executor.shutdown();
-
-            } else {
-                sender.sendMessage(bundle.getString("Have-no-permission"));
-            }
-            return true;
-        }
-        if (label.equalsIgnoreCase("schat-addbadword")) {
-            if (sender.hasPermission("schat.addbadword") || sender.isOp()) {
-                if (args.length == 1) {
-                    String newWord = args[0].toLowerCase();
-                    if (newWord == "*")
-                    {
-                        sender.sendMessage("You cannot add word'*'!");
+                    else if (Objects.equals(LanguageConfig, "en_global")){
+                        LanguageFile = "Language/messages_en_global";
+                    } else if (Objects.equals(LanguageConfig,"ru_RU")) {
+                        LanguageFile = "Language/messages_ru_RU";
+                    } else {
+                        logger.warning("Wrong language in 'config.yml'!");
+                        LanguageFile = "Language/messages_en_global";
                     }
-                    else if (!forbiddenWords.contains(newWord)) {
-                        forbiddenWords.add(newWord);
-                        banWordsConfig.set("forbiddenWords", forbiddenWords);
+                    bundle = ResourceBundle.getBundle(LanguageFile);
+
+                    if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
+                        importDefaultBadWords();
+                    }
+                    logger.info(bundle.getString("Reload"));
+                    String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    executor.submit(() -> {
+
                         try {
-                            banWordsConfig.save(banWordsFile);
-                            sender.sendMessage("Add word '" + newWord + "' to list.");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            sender.sendMessage("Something wrong while plugin was saving bad words!");
-                            logger.warning("Something wrong while plugin was saving bad words!");
+                            URL url = new URL(versionUrl);
+                            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                                String versionStr = reader.readLine();
+                                if (versionStr != null) {
+                                    int version = Integer.parseInt(versionStr);
+                                    if (version > Version) {
+                                        getLogger().warning(bundle.getString("URAlready") + (version - Version) + bundle.getString("BuildVersion"));
+                                    } else if (version < Version) {
+                                        getLogger().warning(bundle.getString("WhatThis"));
+                                    } else if (version == Version){
+                                        getLogger().info(bundle.getString("NewestVersion"));
+                                    }
+                                } else {
+                                    getLogger().warning(bundle.getString("CannotGetVersion"));
+                                }
+                            } catch (IOException | NumberFormatException e) {
+                                getLogger().warning(bundle.getString("unableToRead"));
+                            }
+                        } catch (MalformedURLException e) {
+                            getLogger().warning(bundle.getString("unableToGet"));
                         }
-                    }
+                        //Updater.UseUpdater();
+                    });
+                    executor.shutdown();
+
                 } else {
-                    sender.sendMessage("Usage: /schat-addbadword <word>");
+                    sender.sendMessage(bundle.getString("Have-no-permission"));
                 }
                 return true;
-            } else {
-                sender.sendMessage(bundle.getString("Have-no-permission"));
-                return true;
             }
-        }
+            case "schat-addbadword" -> {
+                if (sender.hasPermission("schat.addbadword") || sender.isOp()) {
+                    if (args.length == 1) {
+                        String newWord = args[0].toLowerCase();
+                        if (newWord.startsWith("*")){
+                            sender.sendMessage("You cannot add word'*'!");
+                        }
+                        else if (!forbiddenWords.contains(newWord)) {
+                            forbiddenWords.add(newWord);
+                            banWordsConfig.set("forbiddenWords", forbiddenWords);
+                            try {
+                                banWordsConfig.save(banWordsFile);
+                                sender.sendMessage("Add word '" + newWord + "' to list.");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                sender.sendMessage("Something wrong while plugin was saving bad words!");
+                                logger.warning("Something wrong while plugin was saving bad words!");
+                            }
+                        }
+                    } else {
+                        sender.sendMessage("Usage: /schat-addbadword <word>");
+                    }
+                    return true;
+                } else {
+                    sender.sendMessage(bundle.getString("Have-no-permission"));
+                    return true;
+                }
+            }
 
-        if (label.equalsIgnoreCase("schat")) {
-            sender.sendMessage("""
-                    Schat V1.14.4
+            case "schat" -> {
+                sender.sendMessage("""
+                    Schat V1.14.5
                     By JohnRicard4096
                     Command Usage：
                     '/schat' for usage menu
@@ -653,50 +618,55 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     '/schat-list page <num>' to some pages
                     """);
 
-        }
+            }
 
 
-        if (label.equalsIgnoreCase("schat-delbadword") ) {
-            if (sender.hasPermission("schat.delbadword") || sender.isOp()) {
-                if (args.length == 1) {
-                    String wordToRemove = args[0].toLowerCase();
-                    if (wordToRemove.equals("*")) {
-                        // 移除所有违禁词
-                        forbiddenWords.clear();
-                        banWordsConfig.set("forbiddenWords", forbiddenWords);
-                        try {
-                            banWordsConfig.save(banWordsFile);
-                            sender.sendMessage("remove all words!");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            sender.sendMessage("Something wrong while plugin was saving bad words!");
-                            logger.warning("Something wrong while plugin was saving bad words!");
-                        }
-                    } else {
-                        if (forbiddenWords.contains(wordToRemove)) {
-                            forbiddenWords.remove(wordToRemove);
+             case"schat-delbadword" -> {
+                if (sender.hasPermission("schat.delbadword") || sender.isOp()) {
+                    if (args.length == 1) {
+                        String wordToRemove = args[0].toLowerCase();
+                        if (wordToRemove.equals("*")) {
+                            // 移除所有违禁词
+                            forbiddenWords.clear();
                             banWordsConfig.set("forbiddenWords", forbiddenWords);
                             try {
                                 banWordsConfig.save(banWordsFile);
-                                sender.sendMessage("Removed word '" + wordToRemove + "'.");
+                                sender.sendMessage("remove all words!");
                             } catch (IOException e) {
                                 e.printStackTrace();
                                 sender.sendMessage("Something wrong while plugin was saving bad words!");
                                 logger.warning("Something wrong while plugin was saving bad words!");
                             }
                         } else {
-                            sender.sendMessage("word '" + wordToRemove + "' was not in list.");
+                            if (forbiddenWords.contains(wordToRemove)) {
+                                forbiddenWords.remove(wordToRemove);
+                                banWordsConfig.set("forbiddenWords", forbiddenWords);
+                                try {
+                                    banWordsConfig.save(banWordsFile);
+                                    sender.sendMessage("Removed word '" + wordToRemove + "'.");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    sender.sendMessage("Something wrong while plugin was saving bad words!");
+                                    logger.warning("Something wrong while plugin was saving bad words!");
+                                }
+                            } else {
+                                sender.sendMessage("word '" + wordToRemove + "' was not in list.");
+                            }
                         }
+                    } else {
+                        sender.sendMessage("Usage: /schat-delbadword <word>");
                     }
+                    return true;
                 } else {
-                    sender.sendMessage("Usage: /schat-delbadword <word>");
+                    sender.sendMessage(bundle.getString("Have-no-permission"));
+                    return true;
                 }
-                return true;
-            } else {
-                sender.sendMessage(bundle.getString("Have-no-permission"));
-                return true;
+            }
+            default -> {
+                return false;
             }
         }
+
 
 
 
