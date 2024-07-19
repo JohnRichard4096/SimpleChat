@@ -13,7 +13,7 @@ import org.intellij.lang.annotations.Language;
 import static org.bukkit.Bukkit.getLogger;
 
 public class Updater {
-    static int Version = 28;
+    static int Version = 29;
     private FileConfiguration banWordsConfig;
     static SimpleChat simpleChat = new SimpleChat();
     static ResourceBundle bundle;

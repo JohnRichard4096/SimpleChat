@@ -37,7 +37,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     private  String LanguageConfig;
     private ResourceBundle bundle;
 
-    private int Version = 28;
+    private int Version = 29;
     private static final Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -86,7 +86,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 
                 *
                  |---------------------------------------------------------------------|
-                 |SimpleChat Build:28                                                 |
+                 |SimpleChat Build:29                                                 |
                  |View https://github.com/JohnRichard/SimpleChat/ to get newest plugin!|
                  |---------------------------------------------------------------------|
                  *
@@ -235,7 +235,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     private void importDefaultBadWords() {
         if (getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)&&getConfig().getBoolean("banConfiguration.enableDefaultBadWords",true)) {
-            InputStream badWordsStream = getClass().getResourceAsStream("/systembadword.txt");
+            InputStream badWordsStream = getClass().getResourceAsStream("systembadword.txt");
 
             if (badWordsStream != null) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(badWordsStream))) {
@@ -533,10 +533,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                         LanguageFile = "Language/messages_en_global";
                     }
                     bundle = ResourceBundle.getBundle(LanguageFile);
-
-                    if (getConfig().getBoolean("banConfiguration.enableDefaultBadWords", true) && getConfig().getBoolean("banConfiguration.importDefaultBadWords", true)) {
-                        importDefaultBadWords();
-                    }
+                    importDefaultBadWords();
                     logger.info(bundle.getString("Reload"));
                     String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
                     ExecutorService executor = Executors.newSingleThreadExecutor();
