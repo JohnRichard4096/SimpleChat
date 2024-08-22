@@ -10,7 +10,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.server.ServerLoadEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +17,9 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -719,10 +721,11 @@ public class SimpleChat extends JavaPlugin implements Listener {
     public void deCode(){
         File dataFolder = this.getDataFolder();
         String filePath = dataFolder.getAbsolutePath()+ "/buildInBadWords.txt";
-        
+
         // 使用临时文件来存储解码后的结果
         File tempFile = new File(filePath + ".tmp");
-        
+        String tempFilePath = filePath + ".tmp";
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
             String line;
@@ -734,11 +737,15 @@ public class SimpleChat extends JavaPlugin implements Listener {
                     String decodedString = new String(decodedBytes,StandardCharsets.UTF_8);
                     // 写入解码后的字符串到临时文件
                     writer.write(decodedString);
+                    Files.write(Paths.get(tempFilePath), decodedString.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE,StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+
                     //writer.newLine(); // 写入换行符
                 } catch (IllegalArgumentException e) {
                     System.err.println("Exception: illegal BASE64 at" + line);
                 }
             }
+
+
         } catch (IOException e) {
             System.err.println("IO ERROR: " + e.getMessage());
         }
@@ -751,8 +758,5 @@ public class SimpleChat extends JavaPlugin implements Listener {
             System.err.println("Can't decode file at " + filePath);
         }
     }
-
-
-
 
 }
