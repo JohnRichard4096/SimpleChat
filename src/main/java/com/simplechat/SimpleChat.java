@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -728,12 +729,12 @@ public class SimpleChat extends JavaPlugin implements Listener {
             while ((line = reader.readLine()) != null) {
                 try {
                     // 对每一行进行 Base64 解码
-                    byte[] decodedBytes = Base64.getDecoder().decode(line);
+                    byte[] decodedBytes = Base64.getDecoder().decode(line.getBytes(StandardCharsets.UTF_8));
                     // 将解码后的字节数组转换为字符串
-                    String decodedString = new String(decodedBytes);
+                    String decodedString = new String(decodedBytes,StandardCharsets.UTF_8);
                     // 写入解码后的字符串到临时文件
                     writer.write(decodedString);
-                    writer.newLine(); // 写入换行符
+                    //writer.newLine(); // 写入换行符
                 } catch (IllegalArgumentException e) {
                     System.err.println("Exception: illegal BASE64 at" + line);
                 }
