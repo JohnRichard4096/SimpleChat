@@ -438,6 +438,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
             case "schat-reload" -> { //显而易见，重载
                 if (sender.hasPermission("schat.reload") || sender.isOp()) {
                     saveResource("buildInBadWords.txt", true);
+                    deCode();
                     loadConfig();
                     loadBanWords();
                     saveResource("Language/messages_zh_CN.properties", true);
