@@ -1,7 +1,7 @@
 name: SimpleChat
 version: '1.15'
 main: com.simplechat.SimpleChat
-api-version: 1.16
+api-version: 1.17
 author: JohnRichard
 
 commands:

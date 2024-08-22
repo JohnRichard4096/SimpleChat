@@ -2,7 +2,6 @@ package com.simplechat;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -11,6 +10,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.server.ServerLoadEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,8 +36,9 @@ public class SimpleChat extends JavaPlugin implements Listener {
     protected static String LanguageFile ="Language/messages_en_global";
     protected static String LanguageConfig;
     protected ResourceBundle bundle;
+    private static final String REQUIRED_VERSION_STRING = "1.17"; // 最低运行版本
 
-    protected int Version = 32;
+    protected int Version = 33;
     protected final static Logger logger = Logger.getLogger("SimpleChat");
 
 
@@ -45,6 +46,49 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        System.out.println("""
+                
+                 ██████████████ ██████████ ██████          ██████ ██████████████ ██████         ██████████████ 
+                 ██          ██ ██      ██ ██  ██████████████  ██ ██          ██ ██  ██         ██          ██ 
+                 ██  ██████████ ████  ████ ██                  ██ ██  ██████  ██ ██  ██         ██  ██████████ 
+                 ██  ██           ██  ██   ██  ██████  ██████  ██ ██  ██  ██  ██ ██  ██         ██  ██         
+                 ██  ██████████   ██  ██   ██  ██  ██  ██  ██  ██ ██  ██████  ██ ██  ██         ██  ██████████ 
+                 ██          ██   ██  ██   ██  ██  ██  ██  ██  ██ ██          ██ ██  ██         ██          ██ 
+                 ██████████  ██   ██  ██   ██  ██  ██████  ██  ██ ██  ██████████ ██  ██         ██  ██████████ 
+                         ██  ██   ██  ██   ██  ██          ██  ██ ██  ██         ██  ██         ██  ██         
+                 ██████████  ██ ████  ████ ██  ██          ██  ██ ██  ██         ██  ██████████ ██  ██████████ 
+                 ██          ██ ██      ██ ██  ██          ██  ██ ██  ██         ██          ██ ██          ██ 
+                 ██████████████ ██████████ ██████          ██████ ██████         ██████████████ ██████████████ 
+                                                                                                               
+                                                                             
+                 ██████████████ ██████  ██████ ██████████████ ██████████████ 
+                 ██          ██ ██  ██  ██  ██ ██          ██ ██          ██ 
+                 ██  ██████████ ██  ██  ██  ██ ██  ██████  ██ ██████  ██████ 
+                 ██  ██         ██  ██  ██  ██ ██  ██  ██  ██     ██  ██     
+                 ██  ██         ██  ██████  ██ ██  ██████  ██     ██  ██     
+                 ██  ██         ██          ██ ██          ██     ██  ██     
+                 ██  ██         ██  ██████  ██ ██  ██████  ██     ██  ██     
+                 ██  ██         ██  ██  ██  ██ ██  ██  ██  ██     ██  ██     
+                 ██  ██████████ ██  ██  ██  ██ ██  ██  ██  ██     ██  ██     
+                 ██          ██ ██  ██  ██  ██ ██  ██  ██  ██     ██  ██     
+                 ██████████████ ██████  ██████ ██████  ██████     ██████     
+                                                                             
+                Build 33
+                Now loading......
+                Please download the latest build in https://github.com/JohnRichard4096/SimpleChat
+                """);
+        String serverInfo = Bukkit.getMinecraftVersion();
+
+        int mainVersion = Integer.parseInt(serverInfo.split("\\.")[1]);
+        // 检查是否兼容  
+        if (mainVersion<=16){
+            logger.warning("Error!SimpleChat must running on bukkit server version after 1.17+");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        logger.info("Plugin is running at "+serverInfo+" a minecraft server.");
+
+
         loadConfig();
         bundle = ResourceBundle.getBundle(LanguageFile);
 
@@ -62,22 +106,8 @@ public class SimpleChat extends JavaPlugin implements Listener {
 
        // Updater Updater = new Updater();	//实例化 类
         logger.info("Build Version:" + Version);
-        System.out.println("""
-                
-                SIMPLE CHAT 1.15
-                Loading plugin......
-                
-                """);
-        System.out.println("""
-                
-                *
-                 |---------------------------------------------------------------------|
-                 |SimpleChat Build:32                                                  |
-                 |View https://github.com/JohnRichard/SimpleChat/ to get newest plugin!|
-                 |---------------------------------------------------------------------|
-                 *
-                
-                """);
+
+        
         FileConfiguration config = getConfig();
         String versionUrl = "http://micro-wave.cc:58080/job/SimpleChat/lastBuild/buildNumber";
         LanguageConfig = config.getString("banConfiguration.Language");
@@ -164,38 +194,57 @@ public class SimpleChat extends JavaPlugin implements Listener {
         importDefaultBadWords();
     logger.info(bundle.getString("OnEnable"));
     }
-/*
-    protected void saveResourceToFile(String resourceName, String targetPath) {
-        File targetFile = new File(getDataFolder().getParentFile(), targetPath);
-        if (targetFile.exists()) {
-            getLogger().info("Target file already exists: " + targetFile.getAbsolutePath());
-            return;
-        }
 
-        InputStream inputStream = getResource(resourceName);
-        if (inputStream == null) {
-            getLogger().warning("Resource not found: " + resourceName);
-            return;
-        }
+    private boolean isCompatible(String serverInfo) {
+        String[] serverParts = serverInfo.split("\\.");
+        String[] requiredParts = REQUIRED_VERSION_STRING.split("\\.");
 
-        if (!targetFile.getParentFile().exists()) {
-            targetFile.getParentFile().mkdirs();
-        }
+        for (int i = 0; i < Math.max(serverParts.length, requiredParts.length); i++) {
+            int serverPart = i < serverParts.length ? Integer.parseInt(serverParts[i]) : 0;
+            int requiredPart = i < requiredParts.length ? Integer.parseInt(requiredParts[i]) : 0;
 
-        try (OutputStream outputStream = new FileOutputStream(targetFile)) {
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
+            if (serverPart < requiredPart) {
+                return false;
+            } else if (serverPart > requiredPart) {
+                return true;
             }
-            getLogger().info("Resource extracted to: " + targetFile.getAbsolutePath());
-        } catch (IOException e) {
-            getLogger().warning("Failed to extract resource: " + e.getMessage());
         }
-    }
+        return true; // 版本相同
 
+}
 
- */
+    /*
+        protected void saveResourceToFile(String resourceName, String targetPath) {
+            File targetFile = new File(getDataFolder().getParentFile(), targetPath);
+            if (targetFile.exists()) {
+                getLogger().info("Target file already exists: " + targetFile.getAbsolutePath());
+                return;
+            }
+    
+            InputStream inputStream = getResource(resourceName);
+            if (inputStream == null) {
+                getLogger().warning("Resource not found: " + resourceName);
+                return;
+            }
+    
+            if (!targetFile.getParentFile().exists()) {
+                targetFile.getParentFile().mkdirs();
+            }
+    
+            try (OutputStream outputStream = new FileOutputStream(targetFile)) {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+                getLogger().info("Resource extracted to: " + targetFile.getAbsolutePath());
+            } catch (IOException e) {
+                getLogger().warning("Failed to extract resource: " + e.getMessage());
+            }
+        }
+    
+    
+     */
     @Override
     public void  onDisable(){
         getLogger().info(bundle.getString("OnDisable"));
@@ -669,10 +718,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
     public void deCode(){
         File dataFolder = this.getDataFolder();
         String filePath = dataFolder.getAbsolutePath()+ "/buildInBadWords.txt";
-        logger.info("Decoding file: " + filePath);
+        
         // 使用临时文件来存储解码后的结果
         File tempFile = new File(filePath + ".tmp");
-        logger.info("Decoding file: " + tempFile.getAbsolutePath());
+        
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
             String line;
@@ -692,10 +741,10 @@ public class SimpleChat extends JavaPlugin implements Listener {
         } catch (IOException e) {
             System.err.println("IO ERROR: " + e.getMessage());
         }
-        logger.info("Removing" + filePath);
+        
         // 删除原文件并重命名临时文件
         if (new File(filePath).delete()) {
-            logger.info("Renaming: " + tempFile.getAbsolutePath());
+            
             tempFile.renameTo(new File(filePath));
         } else {
             System.err.println("Can't decode file at " + filePath);
