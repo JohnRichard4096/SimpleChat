@@ -4,4 +4,5 @@ banConfiguration:
   violationThreshold: 3
   banDuration: 6000
   Language: "en_global"
+UpdateCheck: true
 #Language,You can choose "zh_CN" , "en_global" or "ru_RU"

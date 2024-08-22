@@ -4,10 +4,10 @@ plugins {
 }
 
 group = 'com.simplechat'
-version = '1.14.5'
+version = '1.15'
 shadowJar {
     archiveBaseName.set('SimpleChat')  // jar 文件的基本名字
-    archiveVersion.set('1.14.4')  // jar 文件的版本号
+    archiveVersion.set('1.15')  // jar 文件的版本号
     archiveClassifier.set('')  // jar 文件的额外标签，这里设为空
 }
 repositories {

@@ -6,21 +6,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
-import com.simplechat.SimpleChat;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.intellij.lang.annotations.Language;
 
 import static org.bukkit.Bukkit.getLogger;
 
 public class Updater {
-    static int Version = 29;
-    private FileConfiguration banWordsConfig;
-    static SimpleChat simpleChat = new SimpleChat();
+    static int Version = 31;
     static ResourceBundle bundle;
-    private static String LangFile = simpleChat.LanguageFile;
+    private static String LangFile = SimpleChat.LanguageFile;
+    private static boolean enable = new SimpleChat().updater();
     public static void UseUpdater() {
-         bundle = ResourceBundle.getBundle(LangFile);
-        String versionUrl = "http://cube.lichen0459.top:1145/Version.txt";
+        if(!enable) return;
+        bundle = ResourceBundle.getBundle(LangFile);
+        String versionUrl = "http://micro-wave.cc:58080/job/SimpleChat/lastBuild/buildNumber";
+
         try {
             Thread.sleep(10 * 60 * 3000); // 30分钟的毫秒数
         } catch (InterruptedException e) {
@@ -44,7 +42,7 @@ public class Updater {
                                 getLogger().warning(bundle.getString("URAlready") + (version - Version) + bundle.getString("BuildVersion"));
                             } else if (version < Version) {
                                 getLogger().warning(bundle.getString("WhatThis"));
-                            } else if (version == Version){
+                            } else {
                                 getLogger().info(bundle.getString("NewestVersion"));
                             }
                         } else {
