@@ -33,7 +33,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
     protected static String LanguageConfig;
     protected ResourceBundle bundle;
 
-    protected int Version = 31;
+    protected int Version = 32;
     protected final static Logger logger = Logger.getLogger("SimpleChat");
 
     Command command = new Command();
@@ -66,7 +66,7 @@ public class SimpleChat extends JavaPlugin implements Listener {
                 
                 *
                  |---------------------------------------------------------------------|
-                 |SimpleChat Build:31                                                  |
+                 |SimpleChat Build:32                                                  |
                  |View https://github.com/JohnRichard/SimpleChat/ to get newest plugin!|
                  |---------------------------------------------------------------------|
                  *

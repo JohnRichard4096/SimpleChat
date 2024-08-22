@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 import static org.bukkit.Bukkit.getLogger;
 
 public class Updater {
-    static int Version = 31;
+    static int Version = 32;
     static ResourceBundle bundle;
     private static String LangFile = SimpleChat.LanguageFile;
     private static boolean enable = new SimpleChat().updater();
